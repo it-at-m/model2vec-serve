@@ -49,7 +49,7 @@ base64 = "0.23"
 clap = { version = "4", features = ["derive", "env"] }
 metrics = "0.24"
 metrics-exporter-prometheus = "0.18"
-model2vec-rs = "0.2"
+model2vec-rs = "0.3"
 rustls = "0.23"
 rustls-pki-types = "1"
 serde = { version = "1", features = ["derive"] }
