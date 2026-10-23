@@ -70,7 +70,7 @@ tracing-subscriber = { version = "0.3", features = [
     "fmt",
 ] }
 utoipa = { version = "5", features = ["axum_extras"] }
-utoipa-scalar = { version = "0.3", features = ["axum"] }
+utoipa-scalar = { version = "0.4", features = ["axum"] }
 uuid = { version = "1", features = ["v4", "serde"] }
 x509-parser = "0.18"
 
