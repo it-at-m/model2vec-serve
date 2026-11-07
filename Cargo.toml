@@ -44,12 +44,12 @@ path = "src/main.rs"
 [dependencies]
 anyhow = "1"
 axum = "0.8"
-axum-server = { version = "0.8", features = ["tls-rustls"] }
+axum-server = { version = "0.9", features = ["tls-rustls"] }
 base64 = "0.23"
 clap = { version = "4", features = ["derive", "env"] }
 metrics = "0.24"
 metrics-exporter-prometheus = "0.18"
-model2vec-rs = "0.3"
+model2vec-rs = "0.4"
 rustls = "0.23"
 rustls-pki-types = "1"
 serde = { version = "1", features = ["derive"] }
@@ -70,7 +70,7 @@ tracing-subscriber = { version = "0.3", features = [
     "fmt",
 ] }
 utoipa = { version = "5", features = ["axum_extras"] }
-utoipa-scalar = { version = "0.3", features = ["axum"] }
+utoipa-scalar = { version = "0.4", features = ["axum"] }
 uuid = { version = "1", features = ["v4", "serde"] }
 x509-parser = "0.18"
 
