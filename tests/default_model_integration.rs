@@ -61,10 +61,7 @@ async fn default_model_loads_and_embeds_non_english_input() {
         .unwrap()
         .to_bytes();
     let info: Value = serde_json::from_slice(&info_body).unwrap();
-    assert_eq!(
-        info["model_id"].as_str().unwrap(),
-        DEFAULT_MODEL
-    );
+    assert_eq!(info["model_id"].as_str().unwrap(), DEFAULT_MODEL);
 
     let embed_response = app
         .oneshot(
