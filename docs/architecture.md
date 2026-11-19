@@ -122,7 +122,9 @@ paths, secrets, or stack traces.
 - **Docker**: multi-stage build from `rust:1.98-slim` to
   `debian:bookworm-slim`. The final image is small, exposes port `8080`, and
   runs `model2vec-serve` as the entry point.
-- **Helm**: chart under `helm/model2vec-serve/` with `values.yaml` for a list
+- **Helm**: chart maintained in the
+  [it-at-m/helm-charts](https://github.com/it-at-m/helm-charts) repository
+  (`charts/model2vec-serve/`) with `values.yaml` for a list
   of models, default model, API key, resources, autoscaling, and volume mounts.
   Volume-mounted local models are supported through `extraVolumes` and
   `extraVolumeMounts`.

@@ -1,3 +1,0 @@
-# chart-testing configuration: https://github.com/helm/chart-testing#configuration
-chart-dirs:
-  - helm
