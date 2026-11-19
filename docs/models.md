@@ -26,7 +26,8 @@ memory budget. `model2vec-rs` allocates the full embedding table at startup
 while loading, so their resident memory is roughly **twice** the download
 size: `potion-code-16M-v2` occupies ~65 MB despite its ~33 MB download. F32
 models (all blink releases and most potion releases) use about the same
-amount resident as on disk. Size memory limits for the resident value plus
+amount resident as on disk. For any F32 model the embedding matrix alone is
+`vocab × dim × 4` bytes. Size memory limits for the resident value plus
 headroom for the tokenizer and request buffers.
 
 ## The blink generation (November 2026)
@@ -91,27 +92,6 @@ Notes:
   embedders.
 - The `*-onnx` repositories — ONNX-only, **not loadable** by `model2vec-rs`
   (no `model.safetensors`).
-
-## Third-party static models
-
-Any model in the model2vec format works, not just minishlab releases.
-Notable third-party static embedders:
-
-| Model | Languages | Dimension | Notes |
-|-------|-----------|-----------|-------|
-| `hotchpotch/bekko-static-embedding-v1` | multilingual | 1024 | Strong general model; its training recipe informed blink |
-| `sentence-transformers/static-retrieval-mrl-en-v1` | en | 1024 | MRL-capable retrieval model |
-| `sentence-transformers/static-similarity-mrl-multilingual-v1` | multilingual | 1024 | MRL-capable similarity model |
-| `erikkaum/lattice-retrieval` | en | 1024 | Community retrieval model |
-| `NeuML/pubmedbert-base-embeddings-*` | en | varies | Medical-domain distills in several sizes |
-
-Larger dimensions increase memory usage linearly (the embedding matrix is
-`vocab × dim × 4` bytes for F32 models). Models published in FP16 — for
-example `hotchpotch/bekko-static-embedding-v1`, ~410 MB of FP16 weights —
-are converted to F32 when loaded by `model2vec-rs`, so their embedding table
-occupies roughly **twice** the download size in memory (~820 MB for bekko)
-before the tokenizer and request buffers are added. Budget for resident
-memory, not download size.
 
 ## Choosing a model
 
