@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.1](https://github.com/it-at-m/model2vec-serve/compare/v0.7.0...v0.7.1) - 2026-11-19
+
+### Fixed
+
+- *(deps)* update rust crate axum-server to 0.9
+- bump utoipa-scalar to 0.4 for utoipa 6 compatibility
+- *(deps)* update rust crate utoipa to v6
+
+### Other
+
+- Merge pull request #159 from it-at-m/renovate/docker-base-images
+- Merge pull request #164 from it-at-m/renovate/lock-file-maintenance
+- *(deps)* update rust docker tag to v1.100
+- *(deps)* update debian:trixie-slim docker digest to a72b443
+
 ## [0.7.0](https://github.com/it-at-m/model2vec-serve/compare/v0.6.0...v0.7.0) - 2026-11-19
 
 ### Added
