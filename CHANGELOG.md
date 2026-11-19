@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1](https://github.com/it-at-m/model2vec-serve/compare/v0.6.0...v0.6.1) - 2026-11-19
+
+### Added
+
+- default to minishlab/blink-multilingual-64M and bump model2vec-rs to 0.4
+
+### Fixed
+
+- *(deps)* update rust dependencies ([#156](https://github.com/it-at-m/model2vec-serve/pull/156))
+
+### Other
+
+- *(deps)* update rust:1.98-slim docker digest to 4cd8294 ([#157](https://github.com/it-at-m/model2vec-serve/pull/157))
+- *(deps)* update rust:1.98-slim docker digest to f47a8de ([#155](https://github.com/it-at-m/model2vec-serve/pull/155))
+- *(deps)* update debian:trixie-slim docker digest to a99cfc5 ([#154](https://github.com/it-at-m/model2vec-serve/pull/154))
+- *(deps)* lock file maintenance ([#152](https://github.com/it-at-m/model2vec-serve/pull/152))
+- *(deps)* lock file maintenance ([#148](https://github.com/it-at-m/model2vec-serve/pull/148))
+- *(helm)* release chart 0.6.0 with appVersion 0.6.0 ([#149](https://github.com/it-at-m/model2vec-serve/pull/149))
+
 ## [0.6.0](https://github.com/freinold/model2vec-serve/compare/v0.5.4...v0.6.0) - 2026-09-10
 
 ### Fixed
