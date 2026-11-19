@@ -20,7 +20,8 @@ Key capabilities:
 - `GET /health`, `GET /ready`, `GET /metrics` — operational endpoints.
 - Interactive OpenAPI/Scalar docs at `/docs`.
 - Structured JSON logs with request-correlation IDs.
-- Multi-stage Dockerfile and Helm chart.
+- Multi-stage Dockerfile; the Helm chart lives in the separate
+  [it-at-m/helm-charts](https://github.com/it-at-m/helm-charts) repository.
 
 ## Repository Layout
 
@@ -49,19 +50,13 @@ Key capabilities:
 │       ├── data-model.md           # Entity/field tables
 │       ├── research.md             # Architecture decisions
 │       └── contracts/              # API endpoint contracts
-├── helm/model2vec-serve/           # Helm chart
-│   ├── values.yaml                 # Default chart values
-│   ├── README.md                   # Chart usage documentation
-│   └── templates/                  # Kubernetes manifests
 ├── tests/                          # Test suites
 │   ├── *_contract.rs               # API-shape contract tests
 │   ├── *_integration.rs            # End-to-end integration tests
 │   ├── config_unit.rs              # Configuration unit tests
 │   ├── common/mod.rs               # Shared test helpers
-│   ├── compose/                    # Docker Compose config validation
-│   └── helm/                       # Helm lint/template scripts
+│   └── compose/                    # Docker Compose config validation
 ├── benches/                        # Criterion benchmarks
-├── scripts/                        # Release automation helpers (bump_chart.sh)
 ├── docs/                           # VitePress documentation site
 ├── .env.example                    # Example env for docker compose
 ├── Dockerfile
@@ -94,13 +89,13 @@ cargo bench
 bash tests/compose/compose_config_test.sh
 
 # Run the service locally with one model
-cargo run --release -- --model minishlab/potion-multilingual-128M --port 8080
+cargo run --release -- --model minishlab/blink-multilingual-64M --port 8080
 
 # Run the service locally with multiple models
 cargo run --release -- \
-  --model minishlab/potion-multilingual-128M \
+  --model minishlab/blink-multilingual-64M \
   --model minishlab/potion-code-16M-v2 \
-  --default-model minishlab/potion-multilingual-128M \
+  --default-model minishlab/blink-multilingual-64M \
   --port 8080
 ```
 
@@ -205,12 +200,12 @@ VitePress docs in `docs/` when endpoint behavior changes.
 - Multi-stage build: `rust:1.98-slim` builder → `debian:trixie-slim` runtime.
 - Final image exposes port `8080` and runs `model2vec-serve`.
 - Build: `docker build -t model2vec-serve:latest .`
-- Run: `docker run -p 8080:8080 -e MODEL=minishlab/potion-multilingual-128M model2vec-serve:latest`
+- Run: `docker run -p 8080:8080 -e MODEL=minishlab/blink-multilingual-64M model2vec-serve:latest`
 
 ### Docker Compose
 
 - `docker-compose.yml` runs the published image with two models and a persisted
-  model cache in `./models` (same pattern as the Helm persistence block).
+  model cache in `./models` (same pattern as the chart's persistence block).
 - Launch:
 
 ```bash
@@ -222,23 +217,30 @@ docker compose up -d
 
 ### Helm
 
-- Chart location: `helm/model2vec-serve/`.
+- The chart lives in the separate
+  [it-at-m/helm-charts](https://github.com/it-at-m/helm-charts) repository at
+  `charts/model2vec-serve/`; it is not part of this repository anymore.
 - Key values: `models`, `defaultModel`, `model` (deprecated), `apiKey`,
   `replicaCount`, `image.tag`, `resources`, `autoscaling.enabled`, `extraVolumes`,
   `extraVolumeMounts`, `persistence.enabled`, `persistence.existingClaim`,
   `persistence.mountPath`, `ingress.enabled`, `ingress.className`,
   `ingress.extraLabels`.
-- Install: `helm install model2vec-serve ./helm/model2vec-serve --set models=...`
-- Published OCI chart: helm install model2vec-serve oci://ghcr.io/freinold/model2vec-serve/model2vec-serve --version <chart-version>
-- Chart publishing: .github/workflows/helm-release.yml runs chart-releaser + helm push to ghcr.io on helm/** changes to main; chart-releaser only publishes versions that do not exist yet.
-- Automated chart releases: the chart version mirrors the app version. After each app release, the helm-chart-bump job in .github/workflows/release.yml (via scripts/bump_chart.sh) sets Chart.yaml version/appVersion and all live version examples (install commands, README docker tags), and pushes to main, which triggers helm-release.yml. Collision policy: if the published chart at the app version already has that appVersion (job re-run), it no-ops; if the version was taken by a chart-only hotfix for a different app version, it increments the patch until free.
-- Release detection scope: Cargo.toml `exclude` keeps non-Rust paths (docs, helm, specs, CI) out of the cargo package so commits touching only those files do not open release PRs; README stays packaged (cargo auto-includes it), so `.release-plz.toml` `release_commits` restricts release PRs to feat/fix/perf/revert and chore(deps) commits — this is what prevents the chart bump from re-triggering releases.
-- Chart CI: ct lint + ct install (kind) run on PRs that change helm/**; skip the install test with [skip install] in the commit message.
+- Install: `helm install model2vec-serve oci://ghcr.io/it-at-m/helm-charts/model2vec-serve --version <chart-version>`
+- Chart publishing: chart-releaser in the helm-charts repository publishes to
+  `oci://ghcr.io/it-at-m/helm-charts` on merges to its `main`; every PR that
+  changes a chart must bump the chart version, and ct lint + ct install (kind)
+  run as PR checks (skip the install test with [skip install] in the commit
+  message).
+- Chart versioning is decoupled from app releases: bump `appVersion` in the
+  chart manually when an app release changes deployment-relevant behavior.
+- Chart changes follow the helm-charts contribution guide: maintainers must be
+  listed in the chart's `Chart.yaml` and as code owners in that repo's
+  `.github/CODEOWNERS`.
 - Volume-mounted models are supported via `extraVolumes` / `extraVolumeMounts`.
 - An optional PVC for the model download cache is supported via the persistence block (sets HOME to the mount path; an operator-supplied HOME env wins).
 
-When chart values or templates change, update both `helm/model2vec-serve/README.md`
-and the VitePress docs page `docs/deployment/helm.md`.
+When the chart changes, update its README in the helm-charts repository and
+the VitePress docs page `docs/deployment/helm.md` here.
 
 ## Spec & Documentation Workflow
 
@@ -250,7 +252,8 @@ and the VitePress docs page `docs/deployment/helm.md`.
   - adding or changing CLI arguments (`src/config.rs`);
   - adding or changing endpoints (`src/routes/`);
   - changing error responses (`src/errors.rs`, `contracts/errors.md`);
-  - changing deployment packaging (`Dockerfile`, Helm chart);
+  - changing deployment packaging (`Dockerfile`; Helm chart changes go to the
+    helm-charts repository);
   - updating the README.
 - The docs site is built and deployed to GitHub Pages automatically by
   `.github/workflows/docs.yml`.
@@ -271,4 +274,6 @@ Read these files when relevant to the task:
 - `specs/004-helm-chart-enhancements/spec.md` — chart publishing, persistence, ingress, and chart CI requirements.
 - `specs/004-helm-chart-enhancements/research.md` — chart tooling and cache-redirection decisions.
 - `specs/004-helm-chart-enhancements/contracts/*.md` — chart values and publishing contracts.
-- `helm/model2vec-serve/README.md` and `values.yaml` — chart documentation.
+- `helm/model2vec-serve/README.md` and `values.yaml` in the
+  [it-at-m/helm-charts](https://github.com/it-at-m/helm-charts) repository —
+  chart documentation.

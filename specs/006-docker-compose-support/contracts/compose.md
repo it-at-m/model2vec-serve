@@ -18,10 +18,10 @@ the deployment packaging is defined here.
 ## Compose file rules
 
 1. **MUST** declare a single service named `model2vec-serve` using the image
-   `${MODEL2VEC_IMAGE:-ghcr.io/freinold/model2vec-serve:latest}` — never a
+   `${MODEL2VEC_IMAGE:-ghcr.io/it-at-m/model2vec-serve:latest}` — never a
    `build:` context as the default path (FR-002).
 2. **MUST** set `MODEL` to
-   `${MODEL:-minishlab/potion-multilingual-128M,minishlab/potion-code-16M-v2}`
+   `${MODEL:-minishlab/blink-multilingual-64M,minishlab/potion-code-16M-v2}`
    (FR-001) with the multilingual id as the **first** entry, and pass
    `DEFAULT_MODEL` through with short syntax only (no compose-level default).
    The effective default model is `DEFAULT_MODEL` when set, otherwise the
@@ -86,7 +86,7 @@ rules:
 `tests/compose/compose_config_test.sh` runs `docker compose --env-file /dev/null
 config` (independent of any repo `.env`) and asserts:
 
-- `MODEL` contains exactly `minishlab/potion-multilingual-128M` (first entry =
+- `MODEL` contains exactly `minishlab/blink-multilingual-64M` (first entry =
   effective default via the service's first-entry fallback) and
   `minishlab/potion-code-16M-v2` in the default path.
 - `DEFAULT_MODEL` **absent** when unset (fallback rule); passed through

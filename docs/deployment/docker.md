@@ -17,7 +17,7 @@ only the compiled binary plus CA certificates.
 
 ```bash
 docker run -p 8080:8080 \
-  -e MODEL=minishlab/potion-multilingual-128M \
+  -e MODEL=minishlab/blink-multilingual-64M \
   model2vec-serve:latest
 ```
 
@@ -25,7 +25,7 @@ docker run -p 8080:8080 \
 
 ```bash
 docker run -p 8080:8080 \
-  -e MODEL=minishlab/potion-multilingual-128M \
+  -e MODEL=minishlab/blink-multilingual-64M \
   -e API_KEY=my-secret-key \
   model2vec-serve:latest
 ```
@@ -36,7 +36,7 @@ Pass them after the image name:
 
 ```bash
 docker run -p 8080:8080 \
-  -e MODEL=minishlab/potion-multilingual-128M \
+  -e MODEL=minishlab/blink-multilingual-64M \
   model2vec-serve:latest \
   --max-batch-size 128 \
   --log-level debug
@@ -64,7 +64,7 @@ Pre-built images are published to the GitHub Container Registry (GHCR) on every
 GitHub release. The image name is derived from the repository:
 
 ```text
-ghcr.io/freinold/model2vec-serve
+ghcr.io/it-at-m/model2vec-serve
 ```
 
 ### Pull a released image
@@ -72,7 +72,7 @@ ghcr.io/freinold/model2vec-serve
 Replace `<version>` with the desired release tag (for example `v0.1.0`):
 
 ```bash
-docker pull ghcr.io/freinold/model2vec-serve:<version>
+docker pull ghcr.io/it-at-m/model2vec-serve:<version>
 ```
 
 The `latest` tag is also pushed for the most recent release, but pinning to a
@@ -82,8 +82,8 @@ semantic version is recommended for reproducible deployments.
 
 ```bash
 docker run -p 8080:8080 \
-  -e MODEL=minishlab/potion-multilingual-128M \
-  ghcr.io/freinold/model2vec-serve:<version>
+  -e MODEL=minishlab/blink-multilingual-64M \
+  ghcr.io/it-at-m/model2vec-serve:<version>
 ```
 
 ## Image size

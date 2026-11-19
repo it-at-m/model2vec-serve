@@ -8,7 +8,7 @@
 
 Provide a fully fledged local deployment path via Docker Compose: a root-level
 `docker-compose.yml` that launches the published GHCR image serving two models
-(`minishlab/potion-multilingual-128M` as default and
+(`minishlab/blink-multilingual-64M` as default and
 `minishlab/potion-code-16M-v2`), persists the Hugging Face model cache in a
 host-mounted directory using the same `HOME` redirection pattern as the Helm
 chart, defines a health check and restart policy, and exposes every service
@@ -22,7 +22,7 @@ API behavior changes.
 
 **Language/Version**: Rust 1.98 (image builder, MSRV 1.85 — unchanged); Docker Compose Spec targeting Compose v2 CLI (verified against Docker Compose v5.5.0)
 
-**Primary Dependencies**: `ghcr.io/freinold/model2vec-serve` published image (built by `.github/workflows/docker.yml` on releases; tags `latest`, `<semver>`, `sha-`); existing service env configuration (`src/config.rs`: `MODEL`, `DEFAULT_MODEL`, `API_KEY`, `MAX_BATCH_SIZE`, `MAX_INPUT_LENGTH`, `LOG_LEVEL`, `REQUEST_TIMEOUT_SECONDS`, `MODEL_OWNER`, `MODEL_ALIAS`); runtime base `debian:trixie-slim` (pinned by OCI index digest)
+**Primary Dependencies**: `ghcr.io/it-at-m/model2vec-serve` published image (built by `.github/workflows/docker.yml` on releases; tags `latest`, `<semver>`, `sha-`); existing service env configuration (`src/config.rs`: `MODEL`, `DEFAULT_MODEL`, `API_KEY`, `MAX_BATCH_SIZE`, `MAX_INPUT_LENGTH`, `LOG_LEVEL`, `REQUEST_TIMEOUT_SECONDS`, `MODEL_OWNER`, `MODEL_ALIAS`); runtime base `debian:trixie-slim` (pinned by OCI index digest)
 
 **Storage**: Host bind-mount directory (default `./models`) mounted at `/models` with `HOME=/models`, so the model cache lands in `models/.cache/huggingface/hub` — identical to the Helm persistence pattern (`hf-hub` 0.4.3 sync API ignores `HF_HOME`; `dirs::home_dir()` reads `HOME` first; see `specs/004-helm-chart-enhancements/research.md`)
 

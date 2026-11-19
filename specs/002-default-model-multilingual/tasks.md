@@ -38,8 +38,8 @@ description: "Task list for default model update and spec drift check"
 
 **⚠️ CRITICAL**: No user story documentation sweep can be considered complete until the code and Helm defaults are updated.
 
-- [x] T004 [P] Add `default_value = "minishlab/potion-multilingual-128M"` to the `--model` argument in `src/config.rs`
-- [x] T005 [P] Update `model` default value to `minishlab/potion-multilingual-128M` in `helm/model2vec-serve/values.yaml`
+- [x] T004 [P] Add `default_value = "minishlab/blink-multilingual-64M"` to the `--model` argument in `src/config.rs`
+- [x] T005 [P] Update `model` default value to `minishlab/blink-multilingual-64M` in `helm/model2vec-serve/values.yaml`
 - [x] T006 Update `tests/config_unit.rs` to assert the new default model identifier (or add a dedicated default-value test)
 
 **Checkpoint**: Foundation ready — the CLI and Helm now default to the multilingual model, and the default value is covered by a unit test.
@@ -48,9 +48,9 @@ description: "Task list for default model update and spec drift check"
 
 ## Phase 3: User Story 1 - Multilingual Model as Default (Priority: P1) 🎯 MVP
 
-**Goal**: When the user starts the service without a model identifier, it loads `minishlab/potion-multilingual-128M` and serves embeddings.
+**Goal**: When the user starts the service without a model identifier, it loads `minishlab/blink-multilingual-64M` and serves embeddings.
 
-**Independent Test**: `cargo run --release -- --port 8080` and `curl http://localhost:8080/info` returns `model_id: minishlab/potion-multilingual-128M`.
+**Independent Test**: `cargo run --release -- --port 8080` and `curl http://localhost:8080/info` returns `model_id: minishlab/blink-multilingual-64M`.
 
 ### Tests for User Story 1
 
@@ -68,7 +68,7 @@ description: "Task list for default model update and spec drift check"
 
 ## Phase 4: User Story 2 - Consistent Documentation Examples (Priority: P1)
 
-**Goal**: All public-facing documentation examples that present the default model reference `minishlab/potion-multilingual-128M`.
+**Goal**: All public-facing documentation examples that present the default model reference `minishlab/blink-multilingual-64M`.
 
 **Independent Test**: `grep -R "potion-base-2M" README.md AGENTS.md helm/model2vec-serve/README.md helm/model2vec-serve/values.yaml docs/ specs/001-model2vec-embedding-api/` shows only intentional non-default examples.
 
@@ -78,15 +78,15 @@ description: "Task list for default model update and spec drift check"
 
 ### Implementation for User Story 2
 
-- [x] T012 [P] [US2] Update quick-start examples in `README.md` to use `minishlab/potion-multilingual-128M`
-- [x] T013 [P] [US2] Update local run and Docker examples in `AGENTS.md` to use `minishlab/potion-multilingual-128M`
+- [x] T012 [P] [US2] Update quick-start examples in `README.md` to use `minishlab/blink-multilingual-64M`
+- [x] T013 [P] [US2] Update local run and Docker examples in `AGENTS.md` to use `minishlab/blink-multilingual-64M`
 - [x] T014 [P] [US2] Update default value table and examples in `helm/model2vec-serve/README.md`
-- [x] T015 [P] [US2] Update examples in `docs/getting-started.md` to use `minishlab/potion-multilingual-128M`
-- [x] T016 [P] [US2] Update examples in `docs/configuration.md` to use `minishlab/potion-multilingual-128M`
-- [x] T017 [P] [US2] Update examples in `docs/deployment/docker.md` to use `minishlab/potion-multilingual-128M`
-- [x] T018 [P] [US2] Update examples in `docs/deployment/helm.md` to use `minishlab/potion-multilingual-128M`
-- [x] T019 [P] [US2] Update examples in `docs/api/openai.md` to use `minishlab/potion-multilingual-128M`
-- [x] T020 [P] [US2] Update examples in `docs/api/tei.md` to use `minishlab/potion-multilingual-128M`
+- [x] T015 [P] [US2] Update examples in `docs/getting-started.md` to use `minishlab/blink-multilingual-64M`
+- [x] T016 [P] [US2] Update examples in `docs/configuration.md` to use `minishlab/blink-multilingual-64M`
+- [x] T017 [P] [US2] Update examples in `docs/deployment/docker.md` to use `minishlab/blink-multilingual-64M`
+- [x] T018 [P] [US2] Update examples in `docs/deployment/helm.md` to use `minishlab/blink-multilingual-64M`
+- [x] T019 [P] [US2] Update examples in `docs/api/openai.md` to use `minishlab/blink-multilingual-64M`
+- [x] T020 [P] [US2] Update examples in `docs/api/tei.md` to use `minishlab/blink-multilingual-64M`
 - [x] T021 [US2] Run the grep consistency check and fix any remaining unintentional `potion-base-2M` default references
 
 **Checkpoint**: At this point, User Stories 1 and 2 should both work independently.

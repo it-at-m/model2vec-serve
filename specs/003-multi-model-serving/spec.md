@@ -116,7 +116,7 @@ As an operator, I want metrics and errors to be attributable to individual model
 - **FR-008**: The system MUST expose metrics that are distinguishable by model identifier.
 - **FR-009**: The system MUST report readiness that reflects whether the configured models are loaded and healthy.
 - **FR-010**: The system MUST keep the Helm chart compatible with both single-model and multi-model configurations.
-- **FR-011**: The system MUST support model identifiers such as `minishlab/potion-multilingual-128M` and `minishlab/potion-code-16M-v2` and MUST validate the multi-model feature against these two models.
+- **FR-011**: The system MUST support model identifiers such as `minishlab/blink-multilingual-64M` and `minishlab/potion-code-16M-v2` and MUST validate the multi-model feature against these two models.
 
 ### Key Entities *(include if feature involves data)*
 

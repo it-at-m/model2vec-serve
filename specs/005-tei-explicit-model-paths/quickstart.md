@@ -8,27 +8,27 @@ Data model: [data-model.md](./data-model.md).
 
 - Rust 1.85+ (`cargo --version`).
 - Models available locally for offline testing (or Hugging Face access):
-  e.g., `minishlab/potion-base-32M` and `minishlab/potion-multilingual-128M`.
+  e.g., `minishlab/potion-base-32M` and `minishlab/blink-multilingual-64M`.
 
 ## Start the service (multi-model, one alias)
 
 ```bash
 cargo run --release -- \
   --model minishlab/potion-base-32M \
-  --model minishlab/potion-multilingual-128M \
-  --model-alias "minishlab/potion-multilingual-128M=potion-multi" \
+  --model minishlab/blink-multilingual-64M \
+  --model-alias "minishlab/blink-multilingual-64M=blink-multi" \
   --port 8080
 ```
 
 Expected startup log: two models loaded; no conflict errors. Last-segment
-identifiers: `potion-base-32M`; alias: `potion-multi`.
+identifiers: `potion-base-32M`; alias: `blink-multi`.
 
 ## Validate per-model embedding (P1)
 
 ```bash
 curl -s http://localhost:8080/tei/potion-base-32M/embed \
   -H 'Content-Type: application/json' -d '{"inputs": "hello"}'
-curl -s http://localhost:8080/tei/potion-multi/embed \
+curl -s http://localhost:8080/tei/blink-multi/embed \
   -H 'Content-Type: application/json' -d '{"inputs": ["hello", "world"]}'
 ```
 
@@ -39,7 +39,7 @@ order for the list. Vectors from the two models differ (different models).
 
 ```bash
 curl -s http://localhost:8080/tei/potion-base-32M/info
-curl -s http://localhost:8080/tei/potion-multi/info
+curl -s http://localhost:8080/tei/blink-multi/info
 ```
 
 Expected: each returns `{model_id, max_input_length, embedding_dimension,
@@ -84,9 +84,9 @@ default-model embedding.
 ```bash
 cargo run --release -- \
   --model minishlab/potion-base-32M \
-  --model minishlab/potion-multilingual-128M \
+  --model minishlab/blink-multilingual-64M \
   --model-alias "minishlab/potion-base-32M=same" \
-  --model-alias "minishlab/potion-multilingual-128M=same"
+  --model-alias "minishlab/blink-multilingual-64M=same"
 ```
 
 Both models resolve to the same path identifier `same`. Expected: process

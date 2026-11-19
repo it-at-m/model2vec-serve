@@ -48,7 +48,7 @@ Returns metadata about the configured default model, or the model selected by th
 
 ```json
 {
-  "model_id": "minishlab/potion-multilingual-128M",
+  "model_id": "minishlab/blink-multilingual-64M",
   "max_input_length": 512,
   "embedding_dimension": 384,
   "pooling": "mean"

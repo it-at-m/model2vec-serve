@@ -22,7 +22,7 @@ models.
 Run locally with a Hugging Face model id:
 
 ```bash
-cargo run --release -- --model minishlab/potion-multilingual-128M --port 8080
+cargo run --release -- --model minishlab/blink-multilingual-64M --port 8080
 ```
 
 Request embeddings:
@@ -37,9 +37,9 @@ Serve multiple models in one process:
 
 ```bash
 cargo run --release -- \
-  --model minishlab/potion-multilingual-128M \
+  --model minishlab/blink-multilingual-64M \
   --model minishlab/potion-code-16M-v2 \
-  --default-model minishlab/potion-multilingual-128M \
+  --default-model minishlab/blink-multilingual-64M \
   --port 8080
 ```
 
@@ -75,7 +75,7 @@ All configuration is passed as command-line arguments:
 
 | Argument | Default | Description |
 |----------|---------|-------------|
-| `--model` | `minishlab/potion-multilingual-128M` | Hugging Face model id or local path; repeatable |
+| `--model` | `minishlab/blink-multilingual-64M` | Hugging Face model id or local path; repeatable |
 | `--default-model` | first `--model` | Model to use when a request does not specify one |
 | `--model-owner` | `minishlab` | Model publisher or owner shown in `/v1/models` responses |
 | `--model-alias` | none | Path identifier alias for a model, as `KEY=ALIAS`; repeatable |
@@ -94,10 +94,25 @@ container:
 
 ```bash
 cargo run --release -- \
-  --model minishlab/potion-multilingual-128M \
+  --model minishlab/blink-multilingual-64M \
   --tls-cert /etc/model2vec-serve/tls/tls.crt \
   --tls-key /etc/model2vec-serve/tls/tls.key
 ```
+
+### Choosing models
+
+Any static model2vec model from the
+[minishlab Hugging Face org](https://huggingface.co/minishlab) works. Good
+starting points:
+
+| Model | Footprint | Best for |
+|-------|-----------|----------|
+| `minishlab/blink-multilingual-64M` | ~256 MB | Default — 100+ languages, strongest multilingual quality |
+| `minishlab/blink-8M` | ~31 MB | English-only deployments at minimal footprint |
+| `minishlab/potion-code-16M-v2` | ~33 MB | Source code (Python, Java, JavaScript, Go, PHP, Ruby) |
+
+Models load from the Hugging Face Hub at startup, or from a local path for
+air-gapped setups.
 
 ## Container
 
@@ -105,15 +120,15 @@ cargo run --release -- \
 
 ```bash
 docker build -t model2vec-serve:latest .
-docker run -p 8080:8080 -e MODEL=minishlab/potion-multilingual-128M model2vec-serve:latest
+docker run -p 8080:8080 -e MODEL=minishlab/blink-multilingual-64M model2vec-serve:latest
 ```
 
 Serve multiple models via comma-separated `MODEL`:
 
 ```bash
 docker run -p 8080:8080 \
-  -e MODEL=minishlab/potion-multilingual-128M,minishlab/potion-code-16M-v2 \
-  -e DEFAULT_MODEL=minishlab/potion-multilingual-128M \
+  -e MODEL=minishlab/blink-multilingual-64M,minishlab/potion-code-16M-v2 \
+  -e DEFAULT_MODEL=minishlab/blink-multilingual-64M \
   model2vec-serve:latest
 ```
 
@@ -122,8 +137,8 @@ docker run -p 8080:8080 \
 Released images are published to GHCR:
 
 ```bash
-docker pull ghcr.io/freinold/model2vec-serve:v0.6.0
-docker run -p 8080:8080 -e MODEL=minishlab/potion-multilingual-128M ghcr.io/freinold/model2vec-serve:v0.6.0
+docker pull ghcr.io/it-at-m/model2vec-serve:v0.6.0
+docker run -p 8080:8080 -e MODEL=minishlab/blink-multilingual-64M ghcr.io/it-at-m/model2vec-serve:v0.6.0
 ```
 
 See [docs/deployment/docker.md](docs/deployment/docker.md) for the full release
@@ -138,7 +153,7 @@ cache using the published image:
 docker compose up -d
 ```
 
-The stack serves `minishlab/potion-multilingual-128M` (default) and
+The stack serves `minishlab/blink-multilingual-64M` (default) and
 `minishlab/potion-code-16M-v2`. Models download once into `./models` and
 survive restarts. Customize via `.env` (see `.env.example`).
 
@@ -148,35 +163,34 @@ troubleshooting.
 
 ## Helm
 
-The chart is published to the GitHub Container Registry:
+The Helm chart is maintained in the
+[it-at-m/helm-charts](https://github.com/it-at-m/helm-charts) repository and
+published to GHCR on every versioned chart change:
 
 ```bash
 helm install model2vec-serve \
-  oci://ghcr.io/freinold/model2vec-serve/model2vec-serve \
+  oci://ghcr.io/it-at-m/helm-charts/model2vec-serve \
   --version 0.6.0 \
-  --set models[0]=minishlab/potion-multilingual-128M \
+  --set models[0]=minishlab/blink-multilingual-64M \
   --set apiKey=your-secret-key
 ```
 
-Or install from a local checkout:
+Or via the HTTP chart repository:
 
 ```bash
-helm install model2vec-serve ./helm/model2vec-serve \
-  --set model=minishlab/potion-multilingual-128M \
+helm repo add it-at-m https://it-at-m.github.io/helm-charts
+helm repo update
+helm install model2vec-serve it-at-m/model2vec-serve \
+  --version 0.6.0 \
+  --set models={minishlab/blink-multilingual-64M,minishlab/potion-code-16M-v2} \
+  --set defaultModel=minishlab/blink-multilingual-64M \
   --set apiKey=your-secret-key
 ```
 
-Install with multiple models:
-
-```bash
-helm install model2vec-serve ./helm/model2vec-serve \
-  --set models={minishlab/potion-multilingual-128M,minishlab/potion-code-16M-v2} \
-  --set defaultModel=minishlab/potion-multilingual-128M \
-  --set apiKey=your-secret-key
-```
-
-See [helm/model2vec-serve/README.md](helm/model2vec-serve/README.md) for more
-options, including volume-mounted models.
+See the
+[chart README](https://github.com/it-at-m/helm-charts/tree/main/charts/model2vec-serve)
+for more options, including volume-mounted models, persistence, ingress, and
+end-to-end TLS.
 
 ## Development
 
@@ -198,3 +212,27 @@ Run benchmarks:
 ```bash
 cargo bench
 ```
+
+## Repository transfer
+
+This repository was transferred from the personal account
+[`freinold`](https://github.com/freinold) to the
+[`it-at-m`](https://github.com/it-at-m) organization on 2026-11-19.
+
+- Old GitHub links (`github.com/freinold/model2vec-serve`) redirect here
+  automatically.
+- The documentation site lives at <https://it-at-m.github.io/model2vec-serve/>;
+  the previous `freinold.github.io` URL does **not** redirect.
+- Container images and Helm charts published before the transfer remain frozen
+  under `ghcr.io/freinold/...`. New releases are published to
+  `ghcr.io/it-at-m/model2vec-serve` (image) and
+  `oci://ghcr.io/it-at-m/helm-charts/model2vec-serve` (chart).
+
+## Acknowledgements
+
+This service exists because of [model2vec](https://github.com/MinishLab/model2vec)
+by [Minish Lab](https://github.com/minishlab). Thank you,
+[Stéphan Tulkens](https://github.com/stephantul) and
+[Thomas van Dongen](https://github.com/Pringled), for the great project and
+for continuing to push static embeddings forward — from the potion series to
+the new blink generation.

@@ -69,14 +69,14 @@ Deployment-artifact feature at repository root (per plan.md Project Structure):
 ### Tests for User Story 1 (write first, confirm FAIL) ⚠️
 
 - [X] T004 [P] [US1] Add US1 assertions to `tests/compose/compose_config_test.sh`
-  - Rendered-config assertions (contracts/compose.md → Rendered-config invariants): `MODEL` contains exactly `minishlab/potion-multilingual-128M` and `minishlab/potion-code-16M-v2`; effective `DEFAULT_MODEL` is `minishlab/potion-multilingual-128M`; image is `ghcr.io/freinold/model2vec-serve:latest` by default; port mapping defaults to `8080:8080` and honors `MODEL2VEC_PORT` when set (re-render with the variable set); service is named `model2vec-serve`.
+  - Rendered-config assertions (contracts/compose.md → Rendered-config invariants): `MODEL` contains exactly `minishlab/blink-multilingual-64M` and `minishlab/potion-code-16M-v2`; effective `DEFAULT_MODEL` is `minishlab/blink-multilingual-64M`; image is `ghcr.io/it-at-m/model2vec-serve:latest` by default; port mapping defaults to `8080:8080` and honors `MODEL2VEC_PORT` when set (re-render with the variable set); service is named `model2vec-serve`.
   - Run the script and confirm failure (no compose file yet).
 
 ### Implementation for User Story 1
 
 - [X] T005 [US1] Create `docker-compose.yml` with the two-model default stack
-  - Single service `model2vec-serve`, `container_name: model2vec-serve`, image `${MODEL2VEC_IMAGE:-ghcr.io/freinold/model2vec-serve:latest}` (variable-ized from the start per research.md D2 — avoids rework in US3).
-  - `environment:` mapping form: `MODEL: ${MODEL:-minishlab/potion-multilingual-128M,minishlab/potion-code-16M-v2}` and `DEFAULT_MODEL: ${DEFAULT_MODEL:-minishlab/potion-multilingual-128M}` (FR-001, FR-007; comma-split is handled by `--model`'s `value_delimiter`).
+  - Single service `model2vec-serve`, `container_name: model2vec-serve`, image `${MODEL2VEC_IMAGE:-ghcr.io/it-at-m/model2vec-serve:latest}` (variable-ized from the start per research.md D2 — avoids rework in US3).
+  - `environment:` mapping form: `MODEL: ${MODEL:-minishlab/blink-multilingual-64M,minishlab/potion-code-16M-v2}` and `DEFAULT_MODEL: ${DEFAULT_MODEL:-minishlab/blink-multilingual-64M}` (FR-001, FR-007; comma-split is handled by `--model`'s `value_delimiter`).
   - `ports: ["${MODEL2VEC_PORT:-8080}:8080"]`, `restart: unless-stopped`, `stop_grace_period: 30s` (FR-005, FR-008, FR-013).
   - NO top-level `version:` key; NO health check in this file (inherited from image per contracts/compose.md rule 8); NO volumes yet (US2).
   - Validate: `tests/compose/compose_config_test.sh` passes its US1 + global assertions; then run quickstart.md Scenario 1 end-to-end (`docker compose up -d`, both models answer).
@@ -128,7 +128,7 @@ Deployment-artifact feature at repository root (per plan.md Project Structure):
 
 - [X] T010 [US3] Add short-syntax optional env pass-through to `docker-compose.yml`
   - Append to `environment:` as list entries: `- DEFAULT_MODEL` (retain its mapping default? No — convert `DEFAULT_MODEL` to short syntax and rely on the service's own first-`--model` fallback? NO: FR-007 requires the explicit multilingual default → keep `DEFAULT_MODEL` in mapping form with default; short-syntax list is only for the truly optional ones: `- API_KEY`, `- MODEL_OWNER`, `- MODEL_ALIAS`, `- MAX_BATCH_SIZE`, `- MAX_INPUT_LENGTH`, `- LOG_LEVEL`, `- REQUEST_TIMEOUT_SECONDS`).
-  - Compose allows mixing mapping and list forms only via YAML merge — use the list form for all entries if merging is awkward, with `DEFAULT_MODEL` expressed as `"DEFAULT_MODEL=${DEFAULT_MODEL:-minishlab/potion-multilingual-128M}"` and `MODEL` as `"MODEL=${MODEL:-...}"` (string form sets defaults while short syntax omits unset vars — verified semantics in research.md D4/D5).
+  - Compose allows mixing mapping and list forms only via YAML merge — use the list form for all entries if merging is awkward, with `DEFAULT_MODEL` expressed as `"DEFAULT_MODEL=${DEFAULT_MODEL:-minishlab/blink-multilingual-64M}"` and `MODEL` as `"MODEL=${MODEL:-...}"` (string form sets defaults while short syntax omits unset vars — verified semantics in research.md D4/D5).
   - Validate: `tests/compose/compose_config_test.sh` fully passes; run quickstart.md Scenario 3 (port, API key incl. 401-without/200-with behavior and public operational endpoints, model swap, image pin).
 
 **Checkpoint**: Customization works without editing the file — spec US3 acceptance scenarios 1–3 verifiable.

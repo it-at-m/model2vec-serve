@@ -9,7 +9,7 @@ a corresponding environment variable.
 |----------|----------------------|---------|-------------|
 | `--host` | `HOST` | `0.0.0.0` | Network interface to bind to |
 | `--port` | `PORT` | `8080` | Port to listen on |
-| `--model` | `MODEL` | `minishlab/potion-multilingual-128M` | Hugging Face model id or local path; repeatable |
+| `--model` | `MODEL` | `minishlab/blink-multilingual-64M` | Hugging Face model id or local path; repeatable |
 | `--default-model` | `DEFAULT_MODEL` | first `--model` | Model to use when a request does not specify one |
 | `--model-owner` | `MODEL_OWNER` | `minishlab` | Model publisher or owner shown in `/v1/models` responses |
 | `--model-alias` | `MODEL_ALIAS` | none | Path identifier alias for a model, as `KEY=ALIAS`; repeatable |
@@ -25,7 +25,7 @@ a corresponding environment variable.
 
 ```bash
 cargo run --release -- \
-  --model minishlab/potion-multilingual-128M \
+  --model minishlab/blink-multilingual-64M \
   --port 8080 \
   --log-level debug
 ```
@@ -34,7 +34,7 @@ cargo run --release -- \
 
 ```bash
 cargo run --release -- \
-  --model minishlab/potion-multilingual-128M \
+  --model minishlab/blink-multilingual-64M \
   --api-key my-secret-key \
   --max-batch-size 128 \
   --max-input-length 256
@@ -44,17 +44,17 @@ cargo run --release -- \
 
 ```bash
 cargo run --release -- \
-  --model minishlab/potion-multilingual-128M \
+  --model minishlab/blink-multilingual-64M \
   --model minishlab/potion-code-16M-v2 \
-  --default-model minishlab/potion-multilingual-128M \
+  --default-model minishlab/blink-multilingual-64M \
   --port 8080
 ```
 
 The `MODEL` environment variable accepts a comma-separated list:
 
 ```bash
-MODEL=minishlab/potion-multilingual-128M,minishlab/potion-code-16M-v2 \
-DEFAULT_MODEL=minishlab/potion-multilingual-128M \
+MODEL=minishlab/blink-multilingual-64M,minishlab/potion-code-16M-v2 \
+DEFAULT_MODEL=minishlab/blink-multilingual-64M \
 cargo run --release
 ```
 
@@ -67,7 +67,7 @@ default this is the last segment of the model identifier (e.g.
 
 ```bash
 cargo run --release -- \
-  --model minishlab/potion-multilingual-128M \
+  --model minishlab/blink-multilingual-64M \
   --model /models/potion-code-16M-v2 \
   --model-alias /models/potion-code-16M-v2=code \
   --port 8080
@@ -97,7 +97,7 @@ certificate and its matching private key as file paths:
 
 ```bash
 cargo run --release -- \
-  --model minishlab/potion-multilingual-128M \
+  --model minishlab/blink-multilingual-64M \
   --tls-cert /etc/model2vec-serve/tls/tls.crt \
   --tls-key /etc/model2vec-serve/tls/tls.key \
   --port 8443
@@ -139,18 +139,19 @@ When running the container or Helm chart, pass values as environment variables:
 
 ```bash
 docker run -p 8080:8080 \
-  -e MODEL=minishlab/potion-multilingual-128M \
+  -e MODEL=minishlab/blink-multilingual-64M \
   -e API_KEY=my-secret-key \
   -e MAX_BATCH_SIZE=128 \
   model2vec-serve:latest
 ```
 
-In Helm, use `--set`:
+In Helm, use `--set` with the published chart:
 
 ```bash
-helm install model2vec-serve ./helm/model2vec-serve \
-  --set models={minishlab/potion-multilingual-128M,minishlab/potion-code-16M-v2} \
-  --set defaultModel=minishlab/potion-multilingual-128M \
+helm install model2vec-serve \
+  oci://ghcr.io/it-at-m/helm-charts/model2vec-serve \
+  --set models={minishlab/blink-multilingual-64M,minishlab/potion-code-16M-v2} \
+  --set defaultModel=minishlab/blink-multilingual-64M \
   --set apiKey=my-secret-key \
   --set args[0]=--max-batch-size \
   --set args[1]=128

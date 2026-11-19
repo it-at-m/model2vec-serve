@@ -14,8 +14,8 @@ Single source of truth for launching the service locally. Realized as
 | Field | Value (default) | Source of truth | Notes |
 |-------|-----------------|-----------------|-------|
 | Service name | `model2vec-serve` | this entity | Single service; both models live in one process (multi-model spec) |
-| Image | `${MODEL2VEC_IMAGE:-ghcr.io/freinold/model2vec-serve:latest}` | `MODEL2VEC_IMAGE` | Published GHCR image; no build step (FR-002) |
-| Container env `MODEL` | `${MODEL:-minishlab/potion-multilingual-128M,minishlab/potion-code-16M-v2}` | `MODEL` (service env) | Comma-split by `--model`'s `value_delimiter` (FR-001) |
+| Image | `${MODEL2VEC_IMAGE:-ghcr.io/it-at-m/model2vec-serve:latest}` | `MODEL2VEC_IMAGE` | Published GHCR image; no build step (FR-002) |
+| Container env `MODEL` | `${MODEL:-minishlab/blink-multilingual-64M,minishlab/potion-code-16M-v2}` | `MODEL` (service env) | Comma-split by `--model`'s `value_delimiter` (FR-001) |
 | Container env `DEFAULT_MODEL` | short-syntax pass-through (no compose default) | `DEFAULT_MODEL` | Unset = first `MODEL` entry (service fallback, `src/config.rs`), so the default is always inside the selected set; the multilingual model is first in the default stack (FR-007) |
 | Container env `HOME` | `/models` (fixed) | this entity | Cache redirection; MUST NOT be overridable via `.env` (Helm parity; see research) |
 | Optional service env | `DEFAULT_MODEL`, `API_KEY`, `MODEL_OWNER`, `MODEL_ALIAS`, `MAX_BATCH_SIZE`, `MAX_INPUT_LENGTH`, `LOG_LEVEL`, `REQUEST_TIMEOUT_SECONDS` | short-syntax pass-through | Absent from the container when unset — never set to empty string (see `contracts/compose.md` rationale) |
@@ -62,7 +62,7 @@ to `.env`. Compose auto-loads `.env`.
 
 | Variable | Scope | Default | Effect when set |
 |----------|-------|---------|-----------------|
-| `MODEL2VEC_IMAGE` | compose | `ghcr.io/freinold/model2vec-serve:latest` | Use another image tag or a locally built image |
+| `MODEL2VEC_IMAGE` | compose | `ghcr.io/it-at-m/model2vec-serve:latest` | Use another image tag or a locally built image |
 | `MODEL2VEC_PORT` | compose | `8080` | Host port the service is reachable on (loopback-bound; expose beyond localhost by editing the ports mapping) |
 | `MODEL2VEC_CACHE_DIR` | compose | `./models` | Host directory for the model cache (host paths only) |
 | `MODEL` | service | two-model list (above) | Replace the served model set (comma-separated) |

@@ -47,7 +47,7 @@
 
 **Goal**: A single service instance loads and serves more than one model at startup.
 
-**Independent Test**: Start the service with `minishlab/potion-multilingual-128M` and `minishlab/potion-code-16M-v2`; verify both return embeddings.
+**Independent Test**: Start the service with `minishlab/blink-multilingual-64M` and `minishlab/potion-code-16M-v2`; verify both return embeddings.
 
 ### Tests for User Story 1 (MANDATORY) ⚠️
 

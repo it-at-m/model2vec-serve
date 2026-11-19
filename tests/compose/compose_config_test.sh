@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Offline validation for docker-compose.yml, mirroring tests/helm/*.sh.
+# Offline validation for docker-compose.yml.
 #
 # Renders the compose configuration with `docker compose config` (no image
 # pull, no network) and asserts the deployment contract from
@@ -10,6 +10,12 @@
 set -euo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
+# On Windows, the compose provider renders bind sources as Windows paths
+# (C:/...). Normalize REPO_ROOT the same way so the assertions below match;
+# a no-op on Linux where cygpath does not exist.
+if command -v cygpath >/dev/null 2>&1; then
+    REPO_ROOT="$(cygpath -m "$REPO_ROOT")"
+fi
 COMPOSE_FILE="$REPO_ROOT/docker-compose.yml"
 
 fail() {
@@ -34,6 +40,9 @@ render() {
         docker compose --env-file /dev/null -f "$COMPOSE_FILE" config \
         > "$out" 2>/dev/null \
         || fail "docker compose config failed to render"
+    # Windows compose providers emit backslash paths in bind sources;
+    # normalize to forward slashes so the path assertions are portable.
+    sed -i 's|\\|/|g' "$out"
 }
 
 [ -f "$COMPOSE_FILE" ] || fail "docker-compose.yml not found at repository root"
@@ -65,12 +74,12 @@ grep -q '^  model2vec-serve:' "$TMP" \
     || fail "service 'model2vec-serve' missing"
 pass "service model2vec-serve is defined"
 
-grep -q 'image: ghcr.io/freinold/model2vec-serve:latest' "$TMP" \
+grep -q 'image: ghcr.io/it-at-m/model2vec-serve:latest' "$TMP" \
     || fail "default image is not the published GHCR image"
-pass "default image is ghcr.io/freinold/model2vec-serve:latest"
+pass "default image is ghcr.io/it-at-m/model2vec-serve:latest"
 
 grep -q \
-    'MODEL: minishlab/potion-multilingual-128M,minishlab/potion-code-16M-v2' \
+    'MODEL: minishlab/blink-multilingual-64M,minishlab/potion-code-16M-v2' \
     "$TMP" \
     || fail "MODEL does not contain exactly the two default models"
 pass "MODEL serves multilingual (first/default) + code-v2"
@@ -88,6 +97,7 @@ pass "port mapping defaults to loopback 127.0.0.1:8080"
 MODEL2VEC_PORT=9090 docker compose --env-file /dev/null -f "$COMPOSE_FILE" \
     config > "$TMP_OVERRIDE" 2>/dev/null \
     || fail "config render with MODEL2VEC_PORT failed"
+sed -i 's|\\|/|g' "$TMP_OVERRIDE"
 grep -q 'published: "9090"' "$TMP_OVERRIDE" \
     || fail "MODEL2VEC_PORT override is not honored"
 grep -q 'host_ip: 127.0.0.1' "$TMP_OVERRIDE" \
@@ -111,9 +121,14 @@ if grep -q 'HF_HOME' "$TMP"; then
 fi
 pass "no ineffective HF_HOME variable"
 
-MODEL2VEC_CACHE_DIR=/tmp/m2v-cache-override-test docker compose \
+# MSYS2 (Git Bash on Windows) rewrites POSIX-looking env values when spawning
+# native programs; exclude the probe variable so the pass-through assertion
+# holds there. The variable is ignored on Linux.
+MODEL2VEC_CACHE_DIR=/tmp/m2v-cache-override-test MSYS2_ENV_CONV_EXCL=MODEL2VEC_CACHE_DIR \
+    docker compose \
     --env-file /dev/null -f "$COMPOSE_FILE" config > "$TMP_OVERRIDE" \
     2>/dev/null || fail "config render with MODEL2VEC_CACHE_DIR failed"
+sed -i 's|\\|/|g' "$TMP_OVERRIDE"
 grep -q 'source: /tmp/m2v-cache-override-test$' "$TMP_OVERRIDE" \
     || fail "MODEL2VEC_CACHE_DIR override is not honored"
 pass "MODEL2VEC_CACHE_DIR override honored"
@@ -136,6 +151,7 @@ pass "optional service variables absent when unset"
 API_KEY=probe-key DEFAULT_MODEL=probe-model docker compose --env-file /dev/null \
     -f "$COMPOSE_FILE" config > "$TMP_OVERRIDE" 2>/dev/null \
     || fail "config render with variable probes failed"
+sed -i 's|\\|/|g' "$TMP_OVERRIDE"
 grep -q 'API_KEY: probe-key' "$TMP_OVERRIDE" \
     || fail "API_KEY is not passed through when set"
 grep -q 'DEFAULT_MODEL: probe-model' "$TMP_OVERRIDE" \

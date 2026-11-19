@@ -2,7 +2,7 @@
 
 ## Decision: Default production model
 
-**Decision**: Use `minishlab/potion-multilingual-128M` as the default model
+**Decision**: Use `minishlab/blink-multilingual-64M` as the default model
 identifier when the user does not supply one.
 
 **Rationale**:

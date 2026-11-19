@@ -6,7 +6,7 @@
 
 ## Summary
 
-Extend the model2vec-serve HTTP service to load and serve multiple static embedding models in a single process. Clients select a model via the OpenAI-compatible `/v1/models` and `/v1/embeddings` endpoints, while TEI-compatible endpoints remain usable through a documented default-model or per-model selection strategy. The feature is validated with `minishlab/potion-multilingual-128M` and `minishlab/potion-code-16M-v2`.
+Extend the model2vec-serve HTTP service to load and serve multiple static embedding models in a single process. Clients select a model via the OpenAI-compatible `/v1/models` and `/v1/embeddings` endpoints, while TEI-compatible endpoints remain usable through a documented default-model or per-model selection strategy. The feature is validated with `minishlab/blink-multilingual-64M` and `minishlab/potion-code-16M-v2`.
 
 ## Technical Context
 

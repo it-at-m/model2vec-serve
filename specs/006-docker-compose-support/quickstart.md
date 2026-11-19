@@ -33,7 +33,7 @@ curl -s http://localhost:8080/v1/models | jq .
 ```
 
 Expected: a standard OpenAI model list containing **both**
-`minishlab/potion-multilingual-128M` and `minishlab/potion-code-16M-v2`.
+`minishlab/blink-multilingual-64M` and `minishlab/potion-code-16M-v2`.
 
 Embeddings from each model (default request hits the multilingual model; the
 code model is selected explicitly):
@@ -117,7 +117,7 @@ cp .env.example .env
 - **Models**: set `MODEL=minishlab/potion-base-2M` and
   `DEFAULT_MODEL=minishlab/potion-base-2M` → `/v1/models` lists exactly that
   model and a request without `model` succeeds.
-- **Image pin**: set `MODEL2VEC_IMAGE=ghcr.io/freinold/model2vec-serve:v0.5.0`
+- **Image pin**: set `MODEL2VEC_IMAGE=ghcr.io/it-at-m/model2vec-serve:v0.5.0`
   → `docker compose ps` shows that image running.
 
 When done, remove `.env` (it is git-ignored) and restart:

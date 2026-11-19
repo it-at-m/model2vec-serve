@@ -2,7 +2,7 @@
 
 ## Decision: Validation models
 
-- **Decision**: Use `minishlab/potion-code-16M-v2` as the code embedding validation model alongside `minishlab/potion-multilingual-128M`.
+- **Decision**: Use `minishlab/potion-code-16M-v2` as the code embedding validation model alongside `minishlab/blink-multilingual-64M`.
 - **Rationale**: The repository exists on Hugging Face Hub at `https://huggingface.co/minishlab/potion-code-16M-v2`, is public, and contains the native Model2Vec layout (`config.json`, `model.safetensors`, `tokenizer.json`). It is a 16.2M-parameter, 256-dimensional static code-embedding model and is the successor to `minishlab/potion-code-16M`. `model2vec-rs` 0.2.x supports f16 safetensors and the native layout, so it loads correctly.
 - **Alternatives considered**: `minishlab/potion-code-16M` — the predecessor, still available but explicitly superseded by v2 with worse CoIR benchmark scores.
 
@@ -21,7 +21,7 @@
     "object": "list",
     "data": [
       {
-        "id": "minishlab/potion-multilingual-128M",
+        "id": "minishlab/blink-multilingual-64M",
         "object": "model",
         "created": 1686935002,
         "owned_by": "minishlab"

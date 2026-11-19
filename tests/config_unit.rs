@@ -8,7 +8,7 @@ mod common;
 use clap::{CommandFactory, Parser};
 use model2vec_serve::config::Config;
 
-const DEFAULT_MODEL: &str = "minishlab/potion-multilingual-128M";
+const DEFAULT_MODEL: &str = "minishlab/blink-multilingual-64M";
 const CODE_MODEL: &str = "minishlab/potion-code-16M-v2";
 
 #[test]
@@ -87,14 +87,14 @@ fn parse_single_model_alias_flag() {
     let config = Config::parse_from([
         "model2vec-serve",
         "--model-alias",
-        "minishlab/potion-multilingual-128M=potion-multi",
+        "minishlab/blink-multilingual-64M=blink-multi",
     ]);
 
     assert_eq!(
         config.model_alias,
         vec![(
-            "minishlab/potion-multilingual-128M".to_string(),
-            "potion-multi".to_string()
+            "minishlab/blink-multilingual-64M".to_string(),
+            "blink-multi".to_string()
         )]
     );
 }
@@ -104,7 +104,7 @@ fn parse_multiple_model_alias_flags() {
     let config = Config::parse_from([
         "model2vec-serve",
         "--model-alias",
-        &format!("{DEFAULT_MODEL}=potion-multi"),
+        &format!("{DEFAULT_MODEL}=blink-multi"),
         "--model-alias",
         &format!("{CODE_MODEL}=potion-code"),
     ]);
@@ -112,7 +112,7 @@ fn parse_multiple_model_alias_flags() {
     assert_eq!(
         config.model_alias,
         vec![
-            (DEFAULT_MODEL.to_string(), "potion-multi".to_string()),
+            (DEFAULT_MODEL.to_string(), "blink-multi".to_string()),
             (CODE_MODEL.to_string(), "potion-code".to_string()),
         ]
     );
