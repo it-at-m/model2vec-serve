@@ -28,7 +28,7 @@ Make the model2vec-serve Helm chart a first-class, publishable artifact. Three o
 - Default values MUST render byte-identical resources to the current chart (SC-005, backward compatibility).
 - Chart releases are immutable: no overwriting published versions (FR-003).
 - Publishing uses the existing ghcr.io namespace; no new external services.
-- OCI chart artifact path: `oci://ghcr.io/freinold/model2vec-serve` (mirrors the it-at-m reference; chart name gives the final segment).
+- OCI chart artifact path: `oci://ghcr.io/it-at-m/model2vec-serve` (mirrors the it-at-m reference; chart name gives the final segment).
 - The GitHub Pages site remains dedicated to the VitePress docs; the chart-releaser `gh-pages` index branch is maintained for the classic repository format but is not web-served.
 
 **Scale/Scope**: One chart; two new templates (`pvc.yaml`, `ingress.yaml`); modifications to `values.yaml`, `Chart.yaml`, `deployment.yaml`, `NOTES.txt`; one new release workflow; one extended CI workflow; one `cr.yaml` + one `ct.yaml`; `ci/test-values.yaml` for fast install tests; docs updates.

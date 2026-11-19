@@ -32,9 +32,9 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [x] T004 Add failing template assertions to `tests/helm/template_test.sh`: the default render's labels contain `model2vec-serve-0.2.0` and `app.kubernetes.io/version: "0.3.0"`, and the rendered image is `ghcr.io/freinold/model2vec-serve:0.3.0` (run script, confirm it FAILS)
+- [x] T004 Add failing template assertions to `tests/helm/template_test.sh`: the default render's labels contain `model2vec-serve-0.2.0` and `app.kubernetes.io/version: "0.3.0"`, and the rendered image is `ghcr.io/it-at-m/model2vec-serve:0.3.0` (run script, confirm it FAILS)
 - [x] T005 [P] Update `helm/model2vec-serve/Chart.yaml`: `version: 0.2.0`, `appVersion: "0.3.0"`, add a `maintainers` entry (required by `ct lint` default validation)
-- [x] T006 [P] Change `image.repository` to `ghcr.io/freinold/model2vec-serve` in `helm/model2vec-serve/values.yaml` (FR-005)
+- [x] T006 [P] Change `image.repository` to `ghcr.io/it-at-m/model2vec-serve` in `helm/model2vec-serve/values.yaml` (FR-005)
 - [x] T007 Run `bash tests/helm/lint_test.sh && bash tests/helm/template_test.sh` and confirm both PASS (T004 assertions now green)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
@@ -45,11 +45,11 @@
 
 **Goal**: Chart publishes automatically to ghcr.io as an OCI artifact plus a GitHub Release asset whenever a version-bumped chart change lands on main
 
-**Independent Test**: Merge a chart change with a bumped version → workflow `helm-release` completes → `helm install model2vec-serve oci://ghcr.io/freinold/model2vec-serve/model2vec-serve --version 0.2.0` succeeds on a fresh cluster (quickstart.md §6)
+**Independent Test**: Merge a chart change with a bumped version → workflow `helm-release` completes → `helm install model2vec-serve oci://ghcr.io/it-at-m/model2vec-serve/model2vec-serve --version 0.2.0` succeeds on a fresh cluster (quickstart.md §6)
 
 ### Implementation for User Story 1
 
-- [x] T008 [US1] Create `.github/workflows/helm-release.yml` per contracts/publishing.md: trigger on push to `main` with `paths: helm/**` plus `workflow_dispatch`; permissions `contents: write` + `packages: write`; steps: checkout (`fetch-depth: 0`) → `fregante/setup-git-user@v2` → `azure/setup-helm@v5` → `helm/chart-releaser-action@v1.7.0` (`charts_dir: helm`, `config: cr.yaml`, `CR_TOKEN: ${{ github.token }}`) → `docker/login-action@v4` (ghcr.io) → loop `helm push .cr-release-packages/* oci://ghcr.io/freinold/model2vec-serve`
+- [x] T008 [US1] Create `.github/workflows/helm-release.yml` per contracts/publishing.md: trigger on push to `main` with `paths: helm/**` plus `workflow_dispatch`; permissions `contents: write` + `packages: write`; steps: checkout (`fetch-depth: 0`) → `fregante/setup-git-user@v2` → `azure/setup-helm@v5` → `helm/chart-releaser-action@v1.7.0` (`charts_dir: helm`, `config: cr.yaml`, `CR_TOKEN: ${{ github.token }}`) → `docker/login-action@v4` (ghcr.io) → loop `helm push .cr-release-packages/* oci://ghcr.io/it-at-m/model2vec-serve`
 - [x] T009 [US1] Validate the release flow locally without publishing: `helm package helm/model2vec-serve -d /tmp/cr-test` produces `model2vec-serve-0.2.0.tgz`, and `helm show chart /tmp/cr-test/model2vec-serve-0.2.0.tgz` reports version 0.2.0 / appVersion 0.3.0; confirm workflow YAML parses (e.g. `python3 -c "import yaml,sys; yaml.safe_load(open('.github/workflows/helm-release.yml'))"`)
 
 **Checkpoint**: Publishing pipeline exists and the chart packages cleanly; first real publish happens on merge to main

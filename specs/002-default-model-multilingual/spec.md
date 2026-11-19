@@ -16,12 +16,12 @@ As an operator deploying the embedding service, I want the server to default to 
 
 **Why this priority**: The previous default model was English-centric. Making the multilingual variant the default lowers the barrier to entry for international use cases and aligns the service with the most broadly useful model in the model2vec family.
 
-**Independent Test**: Start the service without providing a model identifier and verify that it loads `minishlab/potion-multilingual-128M` and serves embeddings.
+**Independent Test**: Start the service without providing a model identifier and verify that it loads `minishlab/blink-multilingual-64M` and serves embeddings.
 
 **Acceptance Scenarios**:
 
-1. **Given** the service is started with no explicit model identifier, **When** it initializes, **Then** it loads `minishlab/potion-multilingual-128M` and becomes ready.
-2. **Given** the service is deployed via Helm without setting a model value, **When** the pod starts, **Then** it loads `minishlab/potion-multilingual-128M` by default.
+1. **Given** the service is started with no explicit model identifier, **When** it initializes, **Then** it loads `minishlab/blink-multilingual-64M` and becomes ready.
+2. **Given** the service is deployed via Helm without setting a model value, **When** the pod starts, **Then** it loads `minishlab/blink-multilingual-64M` by default.
 3. **Given** a client sends text in a non-English language to the default deployment, **When** the embeddings endpoint is called, **Then** the service returns valid embeddings.
 
 ---
@@ -36,8 +36,8 @@ As a new user reading the project documentation, I want all examples and default
 
 **Acceptance Scenarios**:
 
-1. **Given** the README and agent guide list quick-start commands, **When** a user reads them, **Then** they reference `minishlab/potion-multilingual-128M` as the default model.
-2. **Given** the Helm chart documentation and `values.yaml` describe the default model, **When** an operator reviews them, **Then** they show `minishlab/potion-multilingual-128M`.
+1. **Given** the README and agent guide list quick-start commands, **When** a user reads them, **Then** they reference `minishlab/blink-multilingual-64M` as the default model.
+2. **Given** the Helm chart documentation and `values.yaml` describe the default model, **When** an operator reviews them, **Then** they show `minishlab/blink-multilingual-64M`.
 3. **Given** the project documentation site includes configuration examples, **When** a user follows them, **Then** the examples consistently use the new default model.
 
 ---
@@ -70,9 +70,9 @@ As a maintainer, I want the architecture spec and research notes to match the ac
 
 ### Functional Requirements
 
-- **FR-001**: The system MUST use `minishlab/potion-multilingual-128M` as the default model identifier when no model is supplied by the user.
-- **FR-002**: The CLI, Helm chart default values, and runtime configuration MUST treat `minishlab/potion-multilingual-128M` as the fallback model.
-- **FR-003**: All public-facing documentation examples (README, AGENTS.md, VitePress docs, Helm chart README) that previously presented `minishlab/potion-base-2M` as the default MUST be updated to `minishlab/potion-multilingual-128M`.
+- **FR-001**: The system MUST use `minishlab/blink-multilingual-64M` as the default model identifier when no model is supplied by the user.
+- **FR-002**: The CLI, Helm chart default values, and runtime configuration MUST treat `minishlab/blink-multilingual-64M` as the fallback model.
+- **FR-003**: All public-facing documentation examples (README, AGENTS.md, VitePress docs, Helm chart README) that previously presented `minishlab/potion-base-2M` as the default MUST be updated to `minishlab/blink-multilingual-64M`.
 - **FR-004**: Any documentation examples that intentionally illustrate specifying a non-default model MUST remain valid and be clearly distinguishable from default examples.
 - **FR-005**: The existing specification and research documents MUST be audited for drift against the current Hugging Face Hub integration.
 - **FR-006**: If the audit finds outdated descriptions of the Hugging Face Hub integration or model-loading behavior, the specification and/or research documents MUST be updated to accurately describe the current state.
@@ -80,7 +80,7 @@ As a maintainer, I want the architecture spec and research notes to match the ac
 
 ### Key Entities *(include if feature involves data)*
 
-- **DefaultModel**: The model identifier used by the service when the user does not supply one. After this change it is `minishlab/potion-multilingual-128M`.
+- **DefaultModel**: The model identifier used by the service when the user does not supply one. After this change it is `minishlab/blink-multilingual-64M`.
 - **ModelIdentifier**: A string referencing either a Hugging Face Hub repository or a local filesystem path; configurable by the user and independent of the default.
 - **TestFixtureModel**: A small, fast model used by automated tests and benchmarks to keep CI quick; distinct from the production default.
 
@@ -88,16 +88,16 @@ As a maintainer, I want the architecture spec and research notes to match the ac
 
 ### Measurable Outcomes
 
-- **SC-001**: Starting the service without a model identifier results in `minishlab/potion-multilingual-128M` being loaded, verified by the readiness endpoint returning success.
-- **SC-002**: 100% of quick-start examples in README, AGENTS.md, and VitePress docs that describe the default model reference `minishlab/potion-multilingual-128M`.
-- **SC-003**: The Helm chart's default `model` value and its README both reference `minishlab/potion-multilingual-128M`.
+- **SC-001**: Starting the service without a model identifier results in `minishlab/blink-multilingual-64M` being loaded, verified by the readiness endpoint returning success.
+- **SC-002**: 100% of quick-start examples in README, AGENTS.md, and VitePress docs that describe the default model reference `minishlab/blink-multilingual-64M`.
+- **SC-003**: The Helm chart's default `model` value and its README both reference `minishlab/blink-multilingual-64M`.
 - **SC-004**: The test suite passes after the default change, with no unintended use of the new larger default model in performance-sensitive test fixtures.
 - **SC-005**: The specification and research documents describing Hugging Face Hub integration contain no statements that contradict the current integration patterns used in the codebase.
 - **SC-006**: If spec drift is found, the affected spec/research files are updated and the audit results are recorded.
 
 ## Assumptions
 
-- `minishlab/potion-multilingual-128M` is publicly available on Hugging Face Hub and is compatible with the current inference crate.
+- `minishlab/blink-multilingual-64M` is publicly available on Hugging Face Hub and is compatible with the current inference crate.
 - The production default can be a larger model than the small fixture used in tests; tests will continue to use a fast, small model to keep CI times low.
 - The Hugging Face Hub integration is stable enough that the audit only needs to reconcile existing documentation, not redesign integration.
 - Users who explicitly set a model identifier or local path are unaffected by the default change.

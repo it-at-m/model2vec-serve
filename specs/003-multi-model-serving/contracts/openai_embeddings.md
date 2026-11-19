@@ -15,7 +15,7 @@
 ```json
 {
   "input": "Hello world",
-  "model": "minishlab/potion-multilingual-128M",
+  "model": "minishlab/blink-multilingual-64M",
   "encoding_format": "float"
 }
 ```
@@ -41,7 +41,7 @@
       "embedding": [0.0123, -0.0456, ...]
     }
   ],
-  "model": "minishlab/potion-multilingual-128M",
+  "model": "minishlab/blink-multilingual-64M",
   "usage": {
     "prompt_tokens": 2,
     "total_tokens": 2

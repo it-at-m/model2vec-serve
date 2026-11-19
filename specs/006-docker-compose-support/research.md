@@ -23,14 +23,14 @@ Docker toolchain.
 
 ## Decision: Image reference and override mechanism
 
-- **Decision**: `image: ${MODEL2VEC_IMAGE:-ghcr.io/freinold/model2vec-serve:latest}`
+- **Decision**: `image: ${MODEL2VEC_IMAGE:-ghcr.io/it-at-m/model2vec-serve:latest}`
   — the published GHCR image by default (FR-002), overridable via the
   `MODEL2VEC_IMAGE` variable (shell env or `.env`, Compose auto-loads `.env`).
-- **Rationale**: `docker.yml` publishes `ghcr.io/freinold/model2vec-serve` with
+- **Rationale**: `docker.yml` publishes `ghcr.io/it-at-m/model2vec-serve` with
   `latest`, `<semver>`, and `sha-` tags on every release; `latest` always
   corresponds to the most recent release, which is the correct default for a
   local evaluation path. Pinning is documented (set
-  `MODEL2VEC_IMAGE=ghcr.io/freinold/model2vec-serve:vX.Y.Z` in `.env`).
+  `MODEL2VEC_IMAGE=ghcr.io/it-at-m/model2vec-serve:vX.Y.Z` in `.env`).
 - **Alternatives considered**:
   - Building locally from the `Dockerfile` — rejected as the default per the
     spec's assumptions (no build step in the fresh-checkout path); documented
@@ -105,9 +105,9 @@ Docker toolchain.
   2. Compose-level knobs (which are *not* service env vars) use a
      `MODEL2VEC_` prefix: `MODEL2VEC_IMAGE`, `MODEL2VEC_PORT` (host-side port
      mapping), `MODEL2VEC_CACHE_DIR` (host-side storage path).
-  Defaults: `MODEL=minishlab/potion-multilingual-128M,minishlab/potion-code-16M-v2`
+  Defaults: `MODEL=minishlab/blink-multilingual-64M,minishlab/potion-code-16M-v2`
   (comma-separated; `--model`'s `value_delimiter = ','` splits env values),
-  `DEFAULT_MODEL=minishlab/potion-multilingual-128M` (FR-007), host port 8080.
+  `DEFAULT_MODEL=minishlab/blink-multilingual-64M` (FR-007), host port 8080.
   An `.env.example` documents every variable (FR-009).
 - **Rationale**: Verbatim pass-through means one env-var vocabulary across
   `docker run`, compose, and Helm (`env` values) — no translation layer to

@@ -50,7 +50,7 @@ ingress:
 
 | Value | Before | After | Reason |
 |-------|--------|-------|--------|
-| `image.repository` | `model2vec-serve` | `ghcr.io/freinold/model2vec-serve` | Published chart must pull a real image (FR-005) |
+| `image.repository` | `model2vec-serve` | `ghcr.io/it-at-m/model2vec-serve` | Published chart must pull a real image (FR-005) |
 
 ## `Chart.yaml` changes
 
@@ -59,4 +59,4 @@ ingress:
 | `version` | `0.1.0` | `0.2.0` |
 | `appVersion` | `"0.1.0"` | `"0.3.0"` |
 | `maintainers` | — | project maintainer entry (required by `ct lint`) |
-| `icon` | — | `https://raw.githubusercontent.com/freinold/model2vec-serve/main/docs/public/model2vec_logo.png` (reused docs logo) |
+| `icon` | — | `https://raw.githubusercontent.com/it-at-m/model2vec-serve/main/docs/public/model2vec_logo.png` (reused docs logo) |

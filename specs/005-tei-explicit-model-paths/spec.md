@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "in relation to issue https://github.com/freinold/model2vec-serve/issues/105, we need to change the TEI implementation to support requests without optional model qualifier for TEI clients. Instead, multiple models should be served TEI compatible on paths /tei/{model_id}/embed and /tei/{model_id}/info. this way we skip the hidden optional model id and make the model choice verbose via api path."
+**Input**: User description: "in relation to issue https://github.com/it-at-m/model2vec-serve/issues/105, we need to change the TEI implementation to support requests without optional model qualifier for TEI clients. Instead, multiple models should be served TEI compatible on paths /tei/{model_id}/embed and /tei/{model_id}/info. this way we skip the hidden optional model id and make the model choice verbose via api path."
 
 ## Clarifications
 

@@ -6,8 +6,9 @@ endpoints, and validating the container and Helm chart.
 ## Prerequisites
 
 - Rust toolchain (stable, 1.98+; the MSRV tracks the toolchain used by CI)
-- A model2vec model identifier (e.g. `minishlab/potion-multilingual-128M`) or a local model
-  directory
+- A model2vec model identifier (e.g. `minishlab/blink-multilingual-64M` for
+  multilingual workloads, `minishlab/blink-8M` for English-only deployments, or
+  a local model directory)
 - Docker (for container validation)
 - Helm 3+ and a Kubernetes cluster or local environment such as kind/minikube
   (for Helm validation)
@@ -17,22 +18,22 @@ endpoints, and validating the container and Helm chart.
 Start the server with a Hugging Face model id:
 
 ```bash
-cargo run --release -- --model minishlab/potion-multilingual-128M --port 8080
+cargo run --release -- --model minishlab/blink-multilingual-64M --port 8080
 ```
 
 You can also set values via environment variables:
 
 ```bash
-MODEL=minishlab/potion-multilingual-128M PORT=8080 cargo run --release
+MODEL=minishlab/blink-multilingual-64M PORT=8080 cargo run --release
 ```
 
 Serve multiple models in one process:
 
 ```bash
 cargo run --release -- \
-  --model minishlab/potion-multilingual-128M \
+  --model minishlab/blink-multilingual-64M \
   --model minishlab/potion-code-16M-v2 \
-  --default-model minishlab/potion-multilingual-128M \
+  --default-model minishlab/blink-multilingual-64M \
   --port 8080
 ```
 
@@ -51,7 +52,7 @@ Expected response:
   "message": "1 model(s) ready",
   "models": [
     {
-      "model_id": "minishlab/potion-multilingual-128M",
+      "model_id": "minishlab/blink-multilingual-64M",
       "status": "ready",
       "message": "model loaded"
     }
@@ -89,7 +90,7 @@ Expected response shape:
       "embedding": [0.0123, -0.0456, "..."]
     }
   ],
-  "model": "minishlab/potion-multilingual-128M",
+  "model": "minishlab/blink-multilingual-64M",
   "usage": {
     "prompt_tokens": 2,
     "total_tokens": 2
@@ -125,7 +126,7 @@ histograms.
 Start the service with a key:
 
 ```bash
-cargo run --release -- --model minishlab/potion-multilingual-128M --api-key secret-key
+cargo run --release -- --model minishlab/blink-multilingual-64M --api-key secret-key
 ```
 
 An unauthenticated request is rejected:
@@ -159,7 +160,7 @@ Run it:
 
 ```bash
 docker run -p 8080:8080 \
-  -e MODEL=minishlab/potion-multilingual-128M \
+  -e MODEL=minishlab/blink-multilingual-64M \
   model2vec-serve:latest
 ```
 
@@ -167,8 +168,8 @@ Serve multiple models:
 
 ```bash
 docker run -p 8080:8080 \
-  -e MODEL=minishlab/potion-multilingual-128M,minishlab/potion-code-16M-v2 \
-  -e DEFAULT_MODEL=minishlab/potion-multilingual-128M \
+  -e MODEL=minishlab/blink-multilingual-64M,minishlab/potion-code-16M-v2 \
+  -e DEFAULT_MODEL=minishlab/blink-multilingual-64M \
   model2vec-serve:latest
 ```
 
@@ -176,11 +177,14 @@ Run the same curl checks as in the local section.
 
 ## Deploy with Helm
 
-Install the chart:
+The chart is published from the
+[it-at-m/helm-charts](https://github.com/it-at-m/helm-charts) repository.
+Install it:
 
 ```bash
-helm install model2vec-serve ./helm/model2vec-serve \
-  --set model=minishlab/potion-multilingual-128M \
+helm install model2vec-serve \
+  oci://ghcr.io/it-at-m/helm-charts/model2vec-serve \
+  --set model=minishlab/blink-multilingual-64M \
   --set apiKey=secret-key \
   --set replicaCount=2
 ```
@@ -188,9 +192,10 @@ helm install model2vec-serve ./helm/model2vec-serve \
 Install with multiple models:
 
 ```bash
-helm install model2vec-serve ./helm/model2vec-serve \
-  --set models={minishlab/potion-multilingual-128M,minishlab/potion-code-16M-v2} \
-  --set defaultModel=minishlab/potion-multilingual-128M \
+helm install model2vec-serve \
+  oci://ghcr.io/it-at-m/helm-charts/model2vec-serve \
+  --set models={minishlab/blink-multilingual-64M,minishlab/potion-code-16M-v2} \
+  --set defaultModel=minishlab/blink-multilingual-64M \
   --set apiKey=secret-key \
   --set replicaCount=2
 ```

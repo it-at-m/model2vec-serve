@@ -13,14 +13,14 @@
 3. Install Helm (`azure/setup-helm@v5`).
 4. `helm/chart-releaser-action@v1.7.0` with `charts_dir: helm`, `config: cr.yaml`, `CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}`.
 5. Login to ghcr.io (`docker/login-action@v4`, `GITHUB_TOKEN`).
-6. For each package in `.cr-release-packages/*`: `helm push <pkg> oci://ghcr.io/freinold/model2vec-serve`.
+6. For each package in `.cr-release-packages/*`: `helm push <pkg> oci://ghcr.io/it-at-m/model2vec-serve`.
 
 **Produced artifacts** (per released chart version):
 
 | Artifact | Location | Naming |
 |----------|----------|--------|
 | Packaged chart | GitHub Release assets | `model2vec-serve-<version>.tgz` on release `model2vec-serve-<version>` |
-| OCI chart | ghcr.io | `oci://ghcr.io/freinold/model2vec-serve/model2vec-serve:<version>` |
+| OCI chart | ghcr.io | `oci://ghcr.io/it-at-m/model2vec-serve/model2vec-serve:<version>` |
 | Classic index | `gh-pages` branch | `index.yaml` (maintained, not web-served — Pages serves the docs site) |
 
 **Immutability** (FR-003): chart-releaser detects the existing `model2vec-serve-<version>` release/tag and skips; the OCI push is only reached when a package was produced. A merged chart change without a version bump MUST NOT occur because `ct lint` blocks it in CI (FR-015).
@@ -29,7 +29,7 @@
 
 ```bash
 helm install model2vec-serve \
-  oci://ghcr.io/freinold/model2vec-serve/model2vec-serve \
+  oci://ghcr.io/it-at-m/model2vec-serve/model2vec-serve \
   --version 0.6.0
 ```
 

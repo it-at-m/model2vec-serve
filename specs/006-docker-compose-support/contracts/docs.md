@@ -65,7 +65,7 @@ docs move together).
    lives in this feature's `data-model.md`; `docs/deployment/compose.md`
    reproduces it and `AGENTS.md`-driven doc-sync rules apply to later changes.
 3. Model ids in docs **MUST** match the compose file exactly
-   (`minishlab/potion-multilingual-128M`,
+   (`minishlab/blink-multilingual-64M`,
    `minishlab/potion-code-16M-v2`).
 4. Docs **MUST** state that the compose path targets local evaluation,
    development, and demos — Kubernetes/Helm remains the production path

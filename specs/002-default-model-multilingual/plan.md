@@ -9,7 +9,7 @@
 ## Summary
 
 Change the service default model from `minishlab/potion-base-2M` to
-`minishlab/potion-multilingual-128M` across the CLI, Helm chart, README,
+`minishlab/blink-multilingual-64M` across the CLI, Helm chart, README,
 AGENTS.md, and VitePress documentation. Keep test fixtures on a small, fast
 model to preserve CI performance. Audit the existing specification and research
 documents for drift against the current Hugging Face Hub integration and update

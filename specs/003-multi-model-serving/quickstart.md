@@ -7,7 +7,7 @@ This guide validates the multi-model feature end-to-end after implementation.
 - Rust toolchain (stable, 1.85+)
 - Docker (for container validation)
 - Helm 3+ and a Kubernetes cluster or local environment such as kind/minikube
-- Two model2vec model identifiers: `minishlab/potion-multilingual-128M` and `minishlab/potion-code-16M-v2`
+- Two model2vec model identifiers: `minishlab/blink-multilingual-64M` and `minishlab/potion-code-16M-v2`
 
 ## Local development validation
 
@@ -15,9 +15,9 @@ This guide validates the multi-model feature end-to-end after implementation.
 
    ```bash
    cargo run --release -- \
-     --model minishlab/potion-multilingual-128M \
+     --model minishlab/blink-multilingual-64M \
      --model minishlab/potion-code-16M-v2 \
-     --default-model minishlab/potion-multilingual-128M \
+     --default-model minishlab/blink-multilingual-64M \
      --port 8080
    ```
 
@@ -44,7 +44,7 @@ This guide validates the multi-model feature end-to-end after implementation.
    ```bash
    curl -X POST http://localhost:8080/v1/embeddings \
      -H "Content-Type: application/json" \
-     -d '{"input":"Hello world","model":"minishlab/potion-multilingual-128M"}'
+     -d '{"input":"Hello world","model":"minishlab/blink-multilingual-64M"}'
    ```
 
    Expected: JSON list response with one embedding object and `model` set to the multilingual identifier.
@@ -112,7 +112,7 @@ This guide validates the multi-model feature end-to-end after implementation.
 1. Start the service with a single model:
 
    ```bash
-   cargo run --release -- --model minishlab/potion-multilingual-128M --port 8080
+   cargo run --release -- --model minishlab/blink-multilingual-64M --port 8080
    ```
 
 2. Verify `/v1/models` returns one model, `/v1/embeddings` without a model uses it, and TEI `/embed` and `/info` behave as before.
@@ -129,8 +129,8 @@ This guide validates the multi-model feature end-to-end after implementation.
 
    ```bash
    docker run -p 8080:8080 \
-     -e MODEL=minishlab/potion-multilingual-128M,minishlab/potion-code-16M-v2 \
-     -e DEFAULT_MODEL=minishlab/potion-multilingual-128M \
+     -e MODEL=minishlab/blink-multilingual-64M,minishlab/potion-code-16M-v2 \
+     -e DEFAULT_MODEL=minishlab/blink-multilingual-64M \
      model2vec-serve:latest
    ```
 
@@ -142,8 +142,8 @@ This guide validates the multi-model feature end-to-end after implementation.
 
    ```bash
    helm install model2vec-serve ./helm/model2vec-serve \
-     --set models={minishlab/potion-multilingual-128M,minishlab/potion-code-16M-v2} \
-     --set defaultModel=minishlab/potion-multilingual-128M \
+     --set models={minishlab/blink-multilingual-64M,minishlab/potion-code-16M-v2} \
+     --set defaultModel=minishlab/blink-multilingual-64M \
      --set apiKey=secret-key
    ```
 
@@ -162,7 +162,7 @@ This guide validates the multi-model feature end-to-end after implementation.
    curl -X POST http://localhost:8080/v1/embeddings \
      -H "Content-Type: application/json" \
      -H "Authorization: Bearer secret-key" \
-     -d '{"input":"Hello from Kubernetes","model":"minishlab/potion-multilingual-128M"}'
+     -d '{"input":"Hello from Kubernetes","model":"minishlab/blink-multilingual-64M"}'
    ```
 
 ## Contract test validation

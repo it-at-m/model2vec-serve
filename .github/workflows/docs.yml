@@ -8,7 +8,6 @@ on:
       - 'README.md'
       - 'specs/**'
       - 'src/**'
-      - 'helm/**'
       - '.github/workflows/docs.yml'
   workflow_dispatch:
 

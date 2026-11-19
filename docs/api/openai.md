@@ -21,7 +21,7 @@ POST /v1/embeddings
 ```json
 {
   "input": "Hello world",
-  "model": "minishlab/potion-multilingual-128M",
+  "model": "minishlab/blink-multilingual-64M",
   "encoding_format": "float"
 }
 ```
@@ -52,7 +52,7 @@ POST /v1/embeddings
       "embedding": [0.0123, -0.0456, "..."]
     }
   ],
-  "model": "minishlab/potion-multilingual-128M",
+  "model": "minishlab/blink-multilingual-64M",
   "usage": {
     "prompt_tokens": 2,
     "total_tokens": 2
@@ -105,7 +105,7 @@ Lists all loaded models in the standard OpenAI model list format.
   "object": "list",
   "data": [
     {
-      "id": "minishlab/potion-multilingual-128M",
+      "id": "minishlab/blink-multilingual-64M",
       "object": "model",
       "created": 1686935002,
       "owned_by": "minishlab"
@@ -123,5 +123,5 @@ curl http://localhost:8080/v1/models
 # Request embeddings
 curl -X POST http://localhost:8080/v1/embeddings \
   -H "Content-Type: application/json" \
-  -d '{"input":["Hello","World"],"model":"minishlab/potion-multilingual-128M"}'
+  -d '{"input":["Hello","World"],"model":"minishlab/blink-multilingual-64M"}'
 ```

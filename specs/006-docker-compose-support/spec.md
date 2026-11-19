@@ -14,7 +14,7 @@
 
 A developer who wants to try or demonstrate the embedding service runs a single
 launch command and gets a running service that serves both the multilingual
-model (`minishlab/potion-multilingual-128M`) and the code model
+model (`minishlab/blink-multilingual-64M`) and the code model
 (`minishlab/potion-code-16M-v2`) from the published container image. The
 developer does not need to build anything, write configuration files, or read
 the Helm documentation.
@@ -163,7 +163,7 @@ onboarding path.
 
 - **FR-001**: The repository MUST include a ready-to-use compose deployment
   file that, by default, serves exactly two models: the multilingual model
-  (`minishlab/potion-multilingual-128M`) and the code model
+  (`minishlab/blink-multilingual-64M`) and the code model
   (`minishlab/potion-code-16M-v2`).
 - **FR-002**: The compose deployment MUST run the published service container
   image (not a locally built one) so a fresh checkout needs no build step.
@@ -215,7 +215,7 @@ onboarding path.
   documented); persists across restarts; created automatically on first
   launch.
 - **Served model set**: The two models exposed by the default deployment —
-  `minishlab/potion-multilingual-128M` (default) and
+  `minishlab/blink-multilingual-64M` (default) and
   `minishlab/potion-code-16M-v2` — matching the service's multi-model
   capability.
 
@@ -247,7 +247,7 @@ onboarding path.
   building a local image is out of scope for the default path (though the
   documentation may mention how to substitute a locally built image).
 - The two default models match those already used in the project's docs and
-  tests: `minishlab/potion-multilingual-128M` (default) and
+  tests: `minishlab/blink-multilingual-64M` (default) and
   `minishlab/potion-code-16M-v2`.
 - The service's existing behavior (multi-model serving, optional API key,
   public operational endpoints, error contract) is reused unchanged; this

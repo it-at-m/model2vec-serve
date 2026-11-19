@@ -22,7 +22,7 @@
   "object": "list",
   "data": [
     {
-      "id": "minishlab/potion-multilingual-128M",
+      "id": "minishlab/blink-multilingual-64M",
       "object": "model",
       "created": 1686935002,
       "owned_by": "minishlab"

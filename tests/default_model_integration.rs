@@ -24,6 +24,9 @@ use tower::ServiceExt;
 
 mod common;
 
+/// The compiled-in default model (mirrors `src/config.rs`).
+const DEFAULT_MODEL: &str = "minishlab/blink-multilingual-64M";
+
 static METRICS: OnceLock<Arc<PrometheusHandle>> = OnceLock::new();
 
 fn metrics_handle() -> Arc<PrometheusHandle> {
@@ -33,12 +36,12 @@ fn metrics_handle() -> Arc<PrometheusHandle> {
 }
 
 #[tokio::test]
-#[ignore = "downloads the default 128M model from Hugging Face Hub"]
+#[ignore = "downloads the default 64M model from Hugging Face Hub"]
 async fn default_model_loads_and_embeds_non_english_input() {
     let config = Config::parse_from(Vec::<&str>::new());
     assert_eq!(
         config.models,
-        vec!["minishlab/potion-multilingual-128M"],
+        vec![DEFAULT_MODEL],
         "default model should be the multilingual model"
     );
 
@@ -58,10 +61,7 @@ async fn default_model_loads_and_embeds_non_english_input() {
         .unwrap()
         .to_bytes();
     let info: Value = serde_json::from_slice(&info_body).unwrap();
-    assert_eq!(
-        info["model_id"].as_str().unwrap(),
-        "minishlab/potion-multilingual-128M"
-    );
+    assert_eq!(info["model_id"].as_str().unwrap(), DEFAULT_MODEL);
 
     let embed_response = app
         .oneshot(

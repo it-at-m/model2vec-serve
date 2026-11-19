@@ -143,7 +143,7 @@ fn e6_expired_certificate_loads_with_expiry_metadata() {
         .metadata
         .expired_since
         .expect("expired metadata must be set");
-    assert!(!expiry.is_empty());
+    assert_ne!(expiry, "");
 }
 
 #[test]
@@ -153,9 +153,9 @@ fn valid_pair_exposes_certificate_metadata() {
         .expect("valid pair must load");
 
     assert!(setup.metadata.expired_since.is_none());
-    assert!(!setup.metadata.subject.is_empty());
-    assert!(!setup.metadata.issuer.is_empty());
-    assert!(!setup.metadata.not_after.is_empty());
+    assert_ne!(setup.metadata.subject, "");
+    assert_ne!(setup.metadata.issuer, "");
+    assert_ne!(setup.metadata.not_after, "");
 }
 
 #[test]

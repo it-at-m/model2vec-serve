@@ -1,39 +1,49 @@
 # Helm
 
-The Helm chart under `helm/model2vec-serve/` deploys `model2vec-serve` on
-Kubernetes.
+The `model2vec-serve` Helm chart is maintained in the
+[it-at-m/helm-charts](https://github.com/it-at-m/helm-charts) repository
+(`charts/model2vec-serve/`) and deploys `model2vec-serve` on Kubernetes.
 
-## Install from the OCI registry
+## Install from the chart repository
 
-The chart is published to the GitHub Container Registry on every versioned
-chart change. Chart releases are automated: the chart version mirrors the app
-version, and every app release automatically bumps and publishes a matching
-chart (see the [release automation](#release-automation) section):
+The chart is published to the it@M GitHub Container Registry on every
+versioned chart change:
 
 ```bash
 helm install model2vec-serve \
-  oci://ghcr.io/freinold/model2vec-serve/model2vec-serve \
+  oci://ghcr.io/it-at-m/helm-charts/model2vec-serve \
   --version 0.6.0 \
-  --set models[0]=minishlab/potion-multilingual-128M \
+  --set models[0]=minishlab/blink-multilingual-64M \
   --set apiKey=your-secret-key
 ```
 
-Installing from a local checkout (see "## Install" below) still works for
-development.
+Or via the HTTP chart repository:
+
+```bash
+helm repo add it-at-m https://it-at-m.github.io/helm-charts
+helm repo update
+helm install model2vec-serve it-at-m/model2vec-serve \
+  --version 0.6.0 \
+  --set models[0]=minishlab/blink-multilingual-64M \
+  --set apiKey=your-secret-key
+```
+
+Installing from a local checkout of `it-at-m/helm-charts`
+(`./charts/model2vec-serve`) still works for development.
 
 ## Install
 
 ```bash
-helm install model2vec-serve ./helm/model2vec-serve \
-  --set model=minishlab/potion-multilingual-128M \
+helm install model2vec-serve ./charts/model2vec-serve \
+  --set model=minishlab/blink-multilingual-64M \
   --set apiKey=your-secret-key
 ```
 
 ## Upgrade
 
 ```bash
-helm upgrade model2vec-serve ./helm/model2vec-serve \
-  --set model=minishlab/potion-multilingual-128M
+helm upgrade model2vec-serve ./charts/model2vec-serve \
+  --set model=minishlab/blink-multilingual-64M
 ```
 
 ## Multi-model install
@@ -42,9 +52,9 @@ Load more than one model and choose which one is used when the request does
 not specify a model:
 
 ```bash
-helm install model2vec-serve ./helm/model2vec-serve \
+helm install model2vec-serve ./charts/model2vec-serve \
   --set models[0]=minishlab/potion-base-2M \
-  --set models[1]=minishlab/potion-multilingual-128M \
+  --set models[1]=minishlab/blink-multilingual-64M \
   --set defaultModel=minishlab/potion-base-2M \
   --set apiKey=your-secret-key
 ```
@@ -58,10 +68,10 @@ derived id); the `alias` becomes the `/tei/{alias}/...` path segment. Duplicate
 resolved path segments abort startup.
 
 ```bash
-helm install model2vec-serve ./helm/model2vec-serve \
-  --set models[0]=minishlab/potion-multilingual-128M \
-  --set modelAliases[0].key=minishlab/potion-multilingual-128M \
-  --set modelAliases[0].alias=potion-multi
+helm install model2vec-serve ./charts/model2vec-serve \
+  --set models[0]=minishlab/blink-multilingual-64M \
+  --set modelAliases[0].key=minishlab/blink-multilingual-64M \
+  --set modelAliases[0].alias=blink-multi
 ```
 
 ## Uninstall
@@ -75,14 +85,14 @@ helm uninstall model2vec-serve
 | Parameter | Description | Default |
 |-----------|-------------|---------|
 | `replicaCount` | Number of replicas | `1` |
-| `image.repository` | Container image repository | `ghcr.io/freinold/model2vec-serve` |
+| `image.repository` | Container image repository | `ghcr.io/it-at-m/model2vec-serve` |
 | `image.tag` | Container image tag | `""` (falls back to `appVersion`) |
 | `image.pullPolicy` | Image pull policy | `IfNotPresent` |
 | `models` | List of Hugging Face model ids or local paths | `[]` |
 | `defaultModel` | Default model when a request does not specify one (defaults to the first model in the list if omitted) | `""` |
 | `modelOwner` | Model publisher or owner shown in `/v1/models` responses | `"minishlab"` |
 | `modelAliases` | List of `{key, alias}` pairs overriding the `/tei/{model_id}/...` path segments; keys must match a `models` entry, duplicate resolved segments abort startup | `[]` |
-| `model` | (Deprecated) Hugging Face model id or local path | `minishlab/potion-multilingual-128M` |
+| `model` | (Deprecated) Hugging Face model id or local path | `minishlab/blink-multilingual-64M` |
 | `apiKey` | API key for authentication | `""` |
 | `args` | Extra CLI arguments | `[]` |
 | `env` | Extra environment variables | `[]` |
@@ -138,7 +148,7 @@ To use a model stored on a cluster volume instead of downloading from Hugging
 Face:
 
 ```bash
-helm install model2vec-serve ./helm/model2vec-serve \
+helm install model2vec-serve ./charts/model2vec-serve \
   --set model=/models/my-model \
   --set extraVolumes[0].name=model-volume \
   --set extraVolumes[0].hostPath.path=/path/to/local/model \
@@ -155,8 +165,8 @@ restarts. An operator-supplied `HOME` entry in `env` overrides the injected
 value.
 
 ```bash
-helm install model2vec-serve ./helm/model2vec-serve \
-  --set models[0]=minishlab/potion-multilingual-128M \
+helm install model2vec-serve ./charts/model2vec-serve \
+  --set models[0]=minishlab/blink-multilingual-64M \
   --set persistence.enabled=true \
   --set persistence.size=10Gi
 ```
@@ -171,7 +181,7 @@ route to the service `http` port; `ingress.extraLabels` are merged with the
 standard chart labels.
 
 ```bash
-helm install model2vec-serve ./helm/model2vec-serve \
+helm install model2vec-serve ./charts/model2vec-serve \
   --set ingress.enabled=true \
   --set ingress.className=nginx \
   --set ingress.hosts[0].host=embeddings.example.com \
@@ -196,8 +206,8 @@ kubectl create secret tls model2vec-serve-tls \
 ```
 
 ```bash
-helm install model2vec-serve ./helm/model2vec-serve \
-  --set models[0]=minishlab/potion-multilingual-128M \
+helm install model2vec-serve ./charts/model2vec-serve \
+  --set models[0]=minishlab/blink-multilingual-64M \
   --set tls.enabled=true \
   --set tls.existingSecret=model2vec-serve-tls
 ```
@@ -208,8 +218,8 @@ example). Note that the ingress-nginx controller must be started with the
 `--enable-ssl-passthrough` command-line flag — it is disabled by default:
 
 ```bash
-helm install model2vec-serve ./helm/model2vec-serve \
-  --set models[0]=minishlab/potion-multilingual-128M \
+helm install model2vec-serve ./charts/model2vec-serve \
+  --set models[0]=minishlab/blink-multilingual-64M \
   --set tls.enabled=true \
   --set tls.existingSecret=model2vec-serve-tls \
   --set ingress.enabled=true \
@@ -238,7 +248,7 @@ name the secret in `ingress.tls`. cert-manager's ingress-shim issues and
 renews the certificate into that secret; the edge terminates TLS:
 
 ```bash
-helm install model2vec-serve ./helm/model2vec-serve \
+helm install model2vec-serve ./charts/model2vec-serve \
   --set ingress.enabled=true \
   --set ingress.className=nginx \
   --set ingress.hosts[0].host=embeddings.example.com \
@@ -266,8 +276,8 @@ spec:
   dnsNames: [embeddings.example.com]
 EOF
 
-helm install model2vec-serve ./helm/model2vec-serve \
-  --set models[0]=minishlab/potion-multilingual-128M \
+helm install model2vec-serve ./charts/model2vec-serve \
+  --set models[0]=minishlab/blink-multilingual-64M \
   --set tls.enabled=true \
   --set tls.existingSecret=model2vec-serve-tls
 ```
@@ -298,8 +308,8 @@ Tune these based on your model size and request volume.
 Enable autoscaling with:
 
 ```bash
-helm install model2vec-serve ./helm/model2vec-serve \
-  --set model=minishlab/potion-multilingual-128M \
+helm install model2vec-serve ./charts/model2vec-serve \
+  --set model=minishlab/blink-multilingual-64M \
   --set autoscaling.enabled=true \
   --set autoscaling.minReplicas=2 \
   --set autoscaling.maxReplicas=10
@@ -307,20 +317,17 @@ helm install model2vec-serve ./helm/model2vec-serve \
 
 ## Release automation
 
-The chart version mirrors the app version and is released automatically:
-after release-plz merges an app release (git tag + GitHub release + docker
-image), the `helm-chart-bump` job in `.github/workflows/release.yml` sets
-`Chart.yaml` `version`/`appVersion` and all live version examples (install
-commands, README docker tags) via `scripts/bump_chart.sh`, pushes to main,
-and `helm-release.yml` publishes the chart to GHCR. The job is safe to
-re-run: if the published chart at the app version already has that
-`appVersion`, it no-ops; if the version was taken by a chart-only hotfix for
-a different app version, it increments the patch until free. App releases
-themselves are only prepared for `feat`/`fix`/`perf`/`revert` and
-`chore(deps)` commits (`release_commits` in `.release-plz.toml`), so the
-chart bump never triggers another release.
+Chart versioning and releases live in the
+[it-at-m/helm-charts](https://github.com/it-at-m/helm-charts) repository:
+every pull request that changes a chart must bump its chart version, and
+merges to `main` trigger chart-releaser, which publishes the chart to GHCR
+(`oci://ghcr.io/it-at-m/helm-charts/model2vec-serve`) and the GitHub Pages
+chart index. The chart's `appVersion` is updated manually to track notable
+app releases.
 
 ## See also
 
-- `helm/model2vec-serve/README.md` for the embedded chart README.
-- `helm/model2vec-serve/values.yaml` for all defaults and comments.
+- The [chart README](https://github.com/it-at-m/helm-charts/tree/main/charts/model2vec-serve)
+  for the full chart documentation.
+- [`values.yaml`](https://github.com/it-at-m/helm-charts/blob/main/charts/model2vec-serve/values.yaml)
+  for all defaults and comments.

@@ -23,7 +23,7 @@ This guide validates the feature end-to-end after implementation.
    curl http://localhost:8080/info
    ```
 
-   Expected: `{"model_id":"minishlab/potion-multilingual-128M",...}`
+   Expected: `{"model_id":"minishlab/blink-multilingual-64M",...}`
 
 3. Verify the health endpoint is ready:
 
@@ -38,7 +38,7 @@ This guide validates the feature end-to-end after implementation.
    ```bash
    curl -X POST http://localhost:8080/v1/embeddings \
      -H "Content-Type: application/json" \
-     -d '{"input":"Hola mundo","model":"minishlab/potion-multilingual-128M"}'
+     -d '{"input":"Hola mundo","model":"minishlab/blink-multilingual-64M"}'
    ```
 
    Expected: JSON list response with one embedding object.
@@ -101,7 +101,7 @@ This guide validates the feature end-to-end after implementation.
    docker run -p 8080:8080 model2vec-serve:latest
    ```
 
-   Expected: The container downloads and loads `minishlab/potion-multilingual-128M`
+   Expected: The container downloads and loads `minishlab/blink-multilingual-64M`
    and the health endpoint becomes ready.
 
 3. Run the same curl checks as in the local section.
@@ -130,7 +130,7 @@ This guide validates the feature end-to-end after implementation.
    curl http://localhost:8080/info
    ```
 
-   Expected: `/info` reports `minishlab/potion-multilingual-128M`.
+   Expected: `/info` reports `minishlab/blink-multilingual-64M`.
 
 ## Documentation consistency validation
 

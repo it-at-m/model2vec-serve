@@ -67,10 +67,10 @@ release-profile build that would slow every PR down.
 
 ## Validate Helm
 
-```bash
-bash tests/helm/lint_test.sh
-bash tests/helm/template_test.sh
-```
+The Helm chart lives in the
+[it-at-m/helm-charts](https://github.com/it-at-m/helm-charts) repository
+(`charts/model2vec-serve/`); its lint and install tests run there as PR
+checks (chart-testing based).
 
 ## Validate the docs site
 
@@ -89,8 +89,7 @@ Run the full quality check locally:
 cargo fmt -- --check
 cargo clippy --all-targets --all-features -- -D warnings
 cargo test
-bash tests/helm/lint_test.sh
-bash tests/helm/template_test.sh
+bash tests/compose/compose_config_test.sh
 ```
 
 ## Code style reminders

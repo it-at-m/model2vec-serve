@@ -11,7 +11,7 @@ default value of the `model` field.
 |-------|------|----------|---------|-------------|
 | host | `String` | no | `0.0.0.0` | Bind address. |
 | port | `u16` | no | `8080` | Listen port. |
-| model | `String` | no | `minishlab/potion-multilingual-128M` | Hugging Face id or local path of the model2vec model. |
+| model | `String` | no | `minishlab/blink-multilingual-64M` | Hugging Face id or local path of the model2vec model. |
 | api_key | `Option<String>` | no | `None` | Shared secret; if set, all embeddings requests require it. |
 | max_batch_size | `usize` | no | `256` | Maximum strings per request. |
 | max_input_length | `usize` | no | `512` | Maximum tokens per input string. |
@@ -24,7 +24,7 @@ The model identifier used when the user does not supply one.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| identifier | `String` | `minishlab/potion-multilingual-128M` after this feature. |
+| identifier | `String` | `minishlab/blink-multilingual-64M` after this feature. |
 
 ### ModelIdentifier
 

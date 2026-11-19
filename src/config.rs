@@ -21,7 +21,7 @@ pub struct Config {
     /// `MODEL` environment variable.
     #[arg(
         long = "model",
-        default_value = "minishlab/potion-multilingual-128M",
+        default_value = "minishlab/blink-multilingual-64M",
         env = "MODEL",
         value_delimiter = ','
     )]

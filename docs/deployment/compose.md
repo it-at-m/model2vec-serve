@@ -2,9 +2,9 @@
 
 The repository ships a `docker-compose.yml` at its root that starts
 `model2vec-serve` as a single local container serving **two** models:
-`minishlab/potion-multilingual-128M` (the default model) and
+`minishlab/blink-multilingual-64M` (the default model) and
 `minishlab/potion-code-16M-v2`. The stack runs the published image
-`ghcr.io/freinold/model2vec-serve:latest` (pushed to the GitHub Container
+`ghcr.io/it-at-m/model2vec-serve:latest` (pushed to the GitHub Container
 Registry on every release), so no build step is required — one command starts
 the whole stack. This path targets local evaluation, development, and demos;
 for production, use [Helm](/deployment/helm) on Kubernetes.
@@ -47,7 +47,7 @@ curl -s http://localhost:8080/v1/models | jq .
 ```
 
 Expected: a standard OpenAI model list containing both
-`minishlab/potion-multilingual-128M` and `minishlab/potion-code-16M-v2`.
+`minishlab/blink-multilingual-64M` and `minishlab/potion-code-16M-v2`.
 
 Embeddings from each model (a request without a `model` field hits the default
 multilingual model; the code model is selected explicitly):
@@ -87,7 +87,7 @@ By default the stack serves exactly two models in one process:
 
 | Model | Role |
 |-------|------|
-| `minishlab/potion-multilingual-128M` | Serves requests that do not name a model (`DEFAULT_MODEL`) |
+| `minishlab/blink-multilingual-64M` | Serves requests that do not name a model (`DEFAULT_MODEL`) |
 | `minishlab/potion-code-16M-v2` | Selected explicitly via the request's `model` field or a `/tei/{model_id}/...` path |
 
 Both the model set and the default are overridable without touching
@@ -172,7 +172,7 @@ are never injected into the container as empty strings.
 
 | Variable | Scope | Default | Effect when set |
 |----------|-------|---------|-----------------|
-| `MODEL2VEC_IMAGE` | compose | `ghcr.io/freinold/model2vec-serve:latest` | Use another image tag or a locally built image |
+| `MODEL2VEC_IMAGE` | compose | `ghcr.io/it-at-m/model2vec-serve:latest` | Use another image tag or a locally built image |
 | `MODEL2VEC_PORT` | compose | `8080` | Host port the service is reachable on (the host side is bound to `127.0.0.1`; edit the ports mapping in `docker-compose.yml` to expose beyond localhost) |
 | `MODEL2VEC_CACHE_DIR` | compose | `./models` | Host directory for the model cache (host paths only; a named volume requires editing `docker-compose.yml`) |
 | `MODEL` | service | two-model list (see *Served models* above) | Replace the served model set (comma-separated) |

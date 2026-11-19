@@ -58,7 +58,7 @@ Returns metadata for the configured default model. Takes no query parameters.
 
 ```json
 {
-  "model_id": "minishlab/potion-multilingual-128M",
+  "model_id": "minishlab/blink-multilingual-64M",
   "max_input_length": 512,
   "embedding_dimension": 384,
   "pooling": "mean"
@@ -81,8 +81,8 @@ the path. The request never carries a model qualifier.
 
 `{model_id}` is the model's **path identifier**: the operator-configured alias
 (`--model-alias KEY=ALIAS` / `MODEL_ALIAS`) or, otherwise, the last segment of
-the model identifier (e.g. `minishlab/potion-multilingual-128M` →
-`potion-multilingual-128M`). Response bodies and `/v1/models` always report the
+the model identifier (e.g. `minishlab/blink-multilingual-64M` →
+`blink-multilingual-64M`). Response bodies and `/v1/models` always report the
 canonical model id.
 
 ### Headers
@@ -123,7 +123,7 @@ Returns TEI info for exactly the model addressed by the path.
 
 ```json
 {
-  "model_id": "minishlab/potion-multilingual-128M",
+  "model_id": "minishlab/blink-multilingual-64M",
   "max_input_length": 512,
   "embedding_dimension": 384,
   "pooling": "mean"

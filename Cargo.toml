@@ -8,10 +8,10 @@ edition = "2024"
 # below their latest versions — which previously downgraded lockfile
 # security fixes (time) right after renovate bumped them.
 rust-version = "1.98"
-authors = ["freinold"]
+authors = ["it-at-m"]
 license = "MIT"
 description = "Lightweight OpenAI and TEI compatible embeddings server for model2vec models"
-repository = "https://github.com/freinold/model2vec-serve"
+repository = "https://github.com/it-at-m/model2vec-serve"
 # Keep release detection scoped to the Rust package: release-plz opens a
 # release PR when any packaged file changes. Without these excludes, commits
 # touching docs, Helm charts, or CI would trigger releases — including the
@@ -21,17 +21,13 @@ exclude = [
     "/.env.example",
     "/.github",
     "/.gitignore",
-    "/.helmignore",
     "/.opencode",
     "/.release-plz.toml",
     "/.specify",
     "/AGENTS.md",
     "/CHANGELOG.md",
-    "/cr.yaml",
-    "/ct.yaml",
     "/docker-compose.yml",
     "/docs",
-    "/helm",
     "/scripts",
     "/specs",
     "/tests",
@@ -49,7 +45,7 @@ base64 = "0.23"
 clap = { version = "4", features = ["derive", "env"] }
 metrics = "0.24"
 metrics-exporter-prometheus = "0.18"
-model2vec-rs = "0.3"
+model2vec-rs = "0.4"
 rustls = "0.23"
 rustls-pki-types = "1"
 serde = { version = "1", features = ["derive"] }

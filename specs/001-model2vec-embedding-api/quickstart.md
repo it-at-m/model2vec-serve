@@ -14,7 +14,7 @@ This guide validates the feature end-to-end after implementation.
 1. Build and run the service:
 
    ```bash
-   cargo run -- --model minishlab/potion-multilingual-128M --port 8080
+   cargo run -- --model minishlab/blink-multilingual-64M --port 8080
    ```
 
 2. Verify health:
@@ -30,7 +30,7 @@ This guide validates the feature end-to-end after implementation.
    ```bash
    curl -X POST http://localhost:8080/v1/embeddings \
      -H "Content-Type: application/json" \
-     -d '{"input":"Hello world","model":"minishlab/potion-multilingual-128M"}'
+     -d '{"input":"Hello world","model":"minishlab/blink-multilingual-64M"}'
    ```
 
    Expected: JSON list response with one embedding object.
@@ -58,7 +58,7 @@ This guide validates the feature end-to-end after implementation.
 1. Start the service with an API key:
 
    ```bash
-   cargo run -- --model minishlab/potion-multilingual-128M --api-key secret-key
+   cargo run -- --model minishlab/blink-multilingual-64M --api-key secret-key
    ```
 
 2. Confirm unauthorized requests are rejected:
@@ -94,7 +94,7 @@ This guide validates the feature end-to-end after implementation.
 
    ```bash
    docker run -p 8080:8080 \
-     -e MODEL=minishlab/potion-multilingual-128M \
+     -e MODEL=minishlab/blink-multilingual-64M \
      model2vec-serve:latest
    ```
 
@@ -108,15 +108,15 @@ without building locally:
 1. Pull the image for a released version:
 
    ```bash
-   docker pull ghcr.io/freinold/model2vec-serve:v0.1.0
+   docker pull ghcr.io/it-at-m/model2vec-serve:v0.1.0
    ```
 
 2. Run the published image:
 
    ```bash
    docker run -p 8080:8080 \
-     -e MODEL=minishlab/potion-multilingual-128M \
-     ghcr.io/freinold/model2vec-serve:v0.1.0
+     -e MODEL=minishlab/blink-multilingual-64M \
+     ghcr.io/it-at-m/model2vec-serve:v0.1.0
    ```
 
 3. Verify health and call the OpenAI-compatible endpoint as in the local section.
@@ -127,7 +127,7 @@ without building locally:
 
    ```bash
    helm install model2vec-serve ./helm/model2vec-serve \
-     --set model=minishlab/potion-multilingual-128M \
+     --set model=minishlab/blink-multilingual-64M \
      --set apiKey=secret-key \
      --set replicaCount=2
    ```

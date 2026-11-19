@@ -17,7 +17,7 @@ Returns the overall health of the service and the status of each configured mode
   "message": "2 models ready, 0 failed",
   "models": [
     {
-      "model_id": "minishlab/potion-multilingual-128M",
+      "model_id": "minishlab/blink-multilingual-64M",
       "status": "ready",
       "message": "model loaded"
     },
@@ -53,12 +53,12 @@ Returns Prometheus-compatible metrics.
 ```text
 # HELP http_requests_total Total HTTP requests
 # TYPE http_requests_total counter
-http_requests_total{method="POST",path="/v1/embeddings",status="200",model="minishlab/potion-multilingual-128M"} 42
+http_requests_total{method="POST",path="/v1/embeddings",status="200",model="minishlab/blink-multilingual-64M"} 42
 http_requests_total{method="POST",path="/v1/embeddings",status="200",model="minishlab/potion-code-16M-v2"} 7
 
 # HELP http_request_duration_seconds HTTP request latency
 # TYPE http_request_duration_seconds histogram
-http_request_duration_seconds_bucket{method="POST",path="/v1/embeddings",model="minishlab/potion-multilingual-128M",le="0.05"} 12
+http_request_duration_seconds_bucket{method="POST",path="/v1/embeddings",model="minishlab/blink-multilingual-64M",le="0.05"} 12
 ...
 ```
 

@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [x] No [NEEDS CLARIFICATION] markers remain — resolved: validation uses `minishlab/potion-code-16M-v2` alongside `minishlab/potion-multilingual-128M`.
+- [x] No [NEEDS CLARIFICATION] markers remain — resolved: validation uses `minishlab/potion-code-16M-v2` alongside `minishlab/blink-multilingual-64M`.
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
