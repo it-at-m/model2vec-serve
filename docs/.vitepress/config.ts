@@ -28,6 +28,7 @@ export default defineConfig({
         items: [
           { text: 'Introduction', link: '/introduction' },
           { text: 'Getting Started', link: '/getting-started' },
+          { text: 'Models', link: '/models' },
           { text: 'Configuration', link: '/configuration' },
           { text: 'Architecture', link: '/architecture' },
           { text: 'Development', link: '/development' },

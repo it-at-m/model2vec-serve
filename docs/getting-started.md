@@ -8,7 +8,7 @@ endpoints, and validating the container and Helm chart.
 - Rust toolchain (stable, 1.98+; the MSRV tracks the toolchain used by CI)
 - A model2vec model identifier (e.g. `minishlab/blink-multilingual-64M` for
   multilingual workloads, `minishlab/blink-8M` for English-only deployments, or
-  a local model directory)
+  a local model directory — see [Models](./models.md) for the full catalog)
 - Docker (for container validation)
 - Helm 3+ and a Kubernetes cluster or local environment such as kind/minikube
   (for Helm validation)

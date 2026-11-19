@@ -111,6 +111,10 @@ starting points:
 | `minishlab/blink-8M` | ~31 MB | English-only deployments at minimal footprint |
 | `minishlab/potion-code-16M-v2` | ~33 MB | Source code (Python, Java, JavaScript, Go, PHP, Ruby) |
 
+See the
+[model guide](https://it-at-m.github.io/model2vec-serve/models) for the full
+catalog, benchmarks, and a detailed choosing guide.
+
 Models load from the Hugging Face Hub at startup, or from a local path for
 air-gapped setups.
 
