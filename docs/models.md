@@ -12,17 +12,22 @@ and embedding dimension.
 
 ## Quick recommendation
 
-| Use case | Model | Footprint | Dimension |
-|----------|-------|-----------|-----------|
+| Use case | Model | Download | Dimension |
+|----------|-------|----------|-----------|
 | Multilingual (default) | `minishlab/blink-multilingual-64M` | ~256 MB | 256 |
 | English only, minimal footprint | `minishlab/blink-8M` | ~31 MB | 256 |
 | Source code | `minishlab/potion-code-16M-v2` | ~33 MB | 256 |
 | Battle-tested multilingual | `minishlab/potion-multilingual-128M` | ~530 MB | 256 |
 | English retrieval / similarity | `minishlab/potion-retrieval-32M` | ~135 MB | 512 |
 
-The footprint is the on-disk size of the model download; the same amount of
-memory is resident once loaded (the service memory-maps nothing — models are
-fully loaded at startup).
+Download is the on-disk size of the model download — it is **not** a safe
+memory budget. `model2vec-rs` allocates the full embedding table at startup
+(nothing is memory-mapped), and models published in FP16 are converted to F32
+while loading, so their resident memory is roughly **twice** the download
+size: `potion-code-16M-v2` occupies ~65 MB despite its ~33 MB download. F32
+models (all blink releases and most potion releases) use about the same
+amount resident as on disk. Size memory limits for the resident value plus
+headroom for the tokenizer and request buffers.
 
 ## The blink generation (November 2026)
 
@@ -48,7 +53,7 @@ This is the compiled-in default of `model2vec-serve`.
 
 ### blink-8M
 
-- English-only, same 31 MB footprint as `potion-base-8M` but meaningfully
+- English-only, same ~31 MB download as `potion-base-8M` but meaningfully
   better: reported MTEB(eng, v2) mean **55.35** vs 53.30 for
   `potion-base-8M` and 54.02 for `potion-base-32M`; retrieval-oriented
   RTEB(eng) 30.84.
@@ -59,18 +64,20 @@ This is the compiled-in default of `model2vec-serve`.
 The potion models are pure static distillations — extremely fast and small,
 with a long track record. They remain fully supported.
 
-| Model | Languages | Dimension | Footprint | Notes |
-|-------|-----------|-----------|-----------|-------|
+| Model | Languages | Dimension | Download | Notes |
+|-------|-----------|-----------|----------|-------|
 | `potion-multilingual-128M` | 101 | 256 | ~530 MB | bge-m3 distill; the long-standing multilingual default |
 | `potion-code-16M-v2` | code | 256 | ~33 MB | Python, Java, JavaScript, Go, PHP, Ruby; distilled from CodeRankEmbed |
 | `potion-base-32M` | en | 512 | ~135 MB | General English |
 | `potion-retrieval-32M` | en | 512 | ~135 MB | Retrieval-tuned `potion-base-32M` |
-| `potion-base-8M` / `4M` / `2M` | en | 256 | 31 MB and below | Tiny models for edge cases and smoke tests |
+| `potion-base-8M` / `4M` / `2M` | en | 256 / 128 / 64 | 31 MB and below | Tiny models for edge cases and smoke tests |
 
 Notes:
 
 - `potion-code-16M-v2` is still the newest code model — no blink-code exists
-  yet. Reported CoIR average: 39.08 (43.36 with a BM25 hybrid).
+  yet. Reported CoIR average: 39.08 (43.36 with a BM25 hybrid). It is
+  published in FP16, so resident memory is ~65 MB (see
+  [download vs. memory](#quick-recommendation)).
 - `potion-retrieval-32M` is the pick for English retrieval workloads when you
   want a pure-distillation model with a long track record.
 - The `potion-base-*` tiny models are what this repository's own test suite
@@ -99,7 +106,12 @@ Notable third-party static embedders:
 | `NeuML/pubmedbert-base-embeddings-*` | en | varies | Medical-domain distills in several sizes |
 
 Larger dimensions increase memory usage linearly (the embedding matrix is
-`vocab × dim × 4` bytes for float32 models).
+`vocab × dim × 4` bytes for F32 models). Models published in FP16 — for
+example `hotchpotch/bekko-static-embedding-v1`, ~410 MB of FP16 weights —
+are converted to F32 when loaded by `model2vec-rs`, so their embedding table
+occupies roughly **twice** the download size in memory (~820 MB for bekko)
+before the tokenizer and request buffers are added. Budget for resident
+memory, not download size.
 
 ## Choosing a model
 
@@ -114,9 +126,12 @@ Work through these questions in order:
 3. **What is the primary task?** Retrieval/search → `blink-8M` (English) or
    `potion-retrieval-32M` (English, 512d). Clustering, classification,
    similarity → `blink-8M` covers these well at minimal footprint.
-4. **What is the memory budget?** Roughly: 31 MB (`blink-8M`) → 33 MB (code)
-   → 135 MB (32M potions) → 256 MB (blink multilingual) → 530 MB (potion
-   multilingual). Multiply by replicas in Kubernetes.
+4. **What is the memory budget?** Plan for resident memory after loading,
+   not the download size — FP16 models double when converted to F32 at load.
+   Roughly: ~31 MB (`blink-8M`) → ~65 MB (`potion-code-16M-v2`, ~33 MB
+   download) → ~135 MB (32M potions) → ~256 MB (`blink-multilingual-64M`) →
+   ~530 MB (`potion-multilingual-128M`). Add headroom for the tokenizer and
+   request buffers, and multiply by replicas in Kubernetes.
 5. **Risk appetite?** The blink models are new (November 2026) with
    independently reported strong benchmarks; the potion models have been
    deployed at scale since 2024. You can serve both at once and compare on
@@ -125,7 +140,10 @@ Work through these questions in order:
 ## Serving multiple models
 
 Pass `--model` repeatedly (or `MODEL` as a comma-separated list). The first
-entry is the default used when a request does not name a model:
+**successfully loaded** model becomes the default used when a request does
+not name a model — if a configured model fails to load at startup, the next
+one takes over. Set `--default-model` to pin a specific model as the
+default; startup then fails if that model cannot be loaded:
 
 ```bash
 model2vec-serve \
@@ -139,7 +157,13 @@ the per-model paths `/tei/{model_id}/embed` and `/tei/{model_id}/info`. See
 
 ## Model metadata
 
-`GET /info` and `GET /v1/models` report each model's identifier, embedding
-dimension, and max input length. The `--model-owner` flag (default
-`minishlab`) controls the publisher shown in `/v1/models` responses — set it
-when serving third-party or locally trained models.
+- `GET /info` (TEI-style) returns metadata for the **default model** only:
+  `model_id`, `max_input_length`, `embedding_dimension`, and pooling mode.
+  To inspect a different loaded model, use `GET /tei/{model_id}/info`.
+- `GET /v1/models` (OpenAI-style) lists every loaded model with `id`,
+  `object`, `created`, and `owned_by`. It deliberately carries no embedding
+  dimensions or input limits — use the TEI info endpoints for those.
+
+The `--model-owner` flag (default `minishlab`) controls the publisher shown
+in `/v1/models` responses — set it when serving third-party or locally
+trained models.
