@@ -1,5 +1,8 @@
 #![allow(missing_docs)]
 #![allow(clippy::unwrap_used)]
+// The model fixtures below are created as symlinks, which requires Unix
+// (and privileges on Windows); skip compilation on other platforms.
+#![cfg(unix)]
 
 mod common;
 

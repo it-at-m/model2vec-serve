@@ -62,7 +62,7 @@ async fn openai_models_lists_loaded_models() {
     assert!(value["data"].is_array());
 
     let data = value["data"].as_array().unwrap();
-    assert!(!data.is_empty());
+    assert_ne!(data.len(), 0);
 
     let model = &data[0];
     assert!(model["id"].is_string());
