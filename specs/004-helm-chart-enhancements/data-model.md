@@ -11,7 +11,7 @@ A versioned, immutable package of the Helm chart distributed through two channel
 | `name` | string | Fixed: `model2vec-serve` (from `Chart.yaml`) |
 | `version` | semver string | Must increment for every merged chart change (enforced by `ct lint`, FR-015); releases are immutable (FR-003) |
 | `appVersion` | string | Matches a published container image tag (e.g. `0.3.0`) so default installs pull a real image (FR-005) |
-| OCI artifact | `oci://ghcr.io/freinold/model2vec-serve/model2vec-serve:<version>` | Pushed by the release workflow after packaging (FR-001) |
+| OCI artifact | `oci://ghcr.io/it-at-m/model2vec-serve/model2vec-serve:<version>` | Pushed by the release workflow after packaging (FR-001) |
 | Release asset | `model2vec-serve-<version>.tgz` | Attached to GitHub Release `model2vec-serve-<version>` (FR-004) |
 
 **Lifecycle**: chart change merged to `main` with bumped `version` → packaged → GitHub Release created → OCI artifact pushed. Re-running with an unchanged version is a no-op (no overwrite, no failure).

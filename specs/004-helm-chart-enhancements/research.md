@@ -2,7 +2,7 @@
 
 ## Decision: Chart publishing mechanism
 
-- **Decision**: Mirror the it-at-m/helm-charts release flow. A new `helm-release.yml` workflow triggers on pushes to `main` that touch `helm/**` (plus `workflow_dispatch`), runs `helm/chart-releaser-action@v1.7.0` (which packages changed charts, creates GitHub Releases named `model2vec-serve-<chart-version>`, attaches the `.tgz` assets, and maintains `index.yaml` on a `gh-pages` branch), then pushes every package in `.cr-release-packages/` to `oci://ghcr.io/freinold/model2vec-serve` via `helm push` after `docker/login-action` authenticates to ghcr.io.
+- **Decision**: Mirror the it-at-m/helm-charts release flow. A new `helm-release.yml` workflow triggers on pushes to `main` that touch `helm/**` (plus `workflow_dispatch`), runs `helm/chart-releaser-action@v1.7.0` (which packages changed charts, creates GitHub Releases named `model2vec-serve-<chart-version>`, attaches the `.tgz` assets, and maintains `index.yaml` on a `gh-pages` branch), then pushes every package in `.cr-release-packages/` to `oci://ghcr.io/it-at-m/model2vec-serve` via `helm push` after `docker/login-action` authenticates to ghcr.io.
 - **Rationale**: Verified against the reference repository's `release.yml` and the chart-releaser-action documentation. The action's `charts_dir` input handles our non-default chart location (`helm/` instead of `charts/`). `docker/login-action` credentials are sufficient for `helm push` to ghcr.io because Helm reads the Docker client config. Re-running with an unchanged chart version is a no-op: the action detects the existing release/tag and skips it, satisfying FR-003 (immutable releases, no failure).
 - **Alternatives considered**:
   - *Plain `helm package` + `helm push` on release events* — loses GitHub Release assets, generated release notes, and the classic `index.yaml`; also couples chart releases to crate releases instead of chart changes.
@@ -35,13 +35,13 @@
 ## Decision: Fast install-test values
 
 - **Decision**: Add `helm/model2vec-serve/ci/test-values.yaml` setting the deprecated single-model value to `minishlab/potion-base-2M` (a ~8 MB model). `ct install` automatically installs the chart once per file in the chart's `ci/` directory.
-- **Rationale**: The default model (`minishlab/potion-multilingual-128M`, hundreds of MB) would make every kind install test slow and flaky, risking the SC-007 ten-minute budget. The tiny model exercises the full startup path (image pull, model download, readiness probe) at a fraction of the cost.
+- **Rationale**: The default model (`minishlab/blink-multilingual-64M`, hundreds of MB) would make every kind install test slow and flaky, risking the SC-007 ten-minute budget. The tiny model exercises the full startup path (image pull, model download, readiness probe) at a fraction of the cost.
 - **Alternatives considered**: Installing with default values — rejected for CI time/flakiness; skipping the install test — violates the clarified scope of US4.
 
 ## Decision: Chart metadata and default image for publishing
 
-- **Decision**: `Chart.yaml` moves to `version: 0.2.0` and `appVersion: "0.3.0"` (matching the current crate release), gains a `maintainers` entry (required by `ct lint`'s default maintainer validation), and `values.yaml` sets `image.repository: ghcr.io/freinold/model2vec-serve`. The deployment template already defaults `image.tag` to `appVersion`, so the published chart pulls the published image with no overrides (FR-005).
-- **Rationale**: chart-releaser only releases charts whose `version` changed; `0.2.0` is the first published version containing persistence and ingress. `appVersion: 0.3.0` corresponds to the existing `ghcr.io/freinold/model2vec-serve:0.3.0` image published by `docker.yml`.
+- **Decision**: `Chart.yaml` moves to `version: 0.2.0` and `appVersion: "0.3.0"` (matching the current crate release), gains a `maintainers` entry (required by `ct lint`'s default maintainer validation), and `values.yaml` sets `image.repository: ghcr.io/it-at-m/model2vec-serve`. The deployment template already defaults `image.tag` to `appVersion`, so the published chart pulls the published image with no overrides (FR-005).
+- **Rationale**: chart-releaser only releases charts whose `version` changed; `0.2.0` is the first published version containing persistence and ingress. `appVersion: 0.3.0` corresponds to the existing `ghcr.io/it-at-m/model2vec-serve:0.3.0` image published by `docker.yml`.
 - **Alternatives considered**: Keeping `image.repository: model2vec-serve` — the published chart would reference a nonexistent registry image, failing SC-001.
 
 ## Decision: Ingress and PVC template shape

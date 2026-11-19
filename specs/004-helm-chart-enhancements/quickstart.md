@@ -73,9 +73,9 @@ After merging a chart change with a bumped `Chart.yaml` version to `main`:
 
 ```bash
 helm install model2vec-serve \
-  oci://ghcr.io/freinold/model2vec-serve/model2vec-serve \
+  oci://ghcr.io/it-at-m/model2vec-serve/model2vec-serve \
   --version <version>
 kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=model2vec-serve --timeout=300s
 ```
 
-**Expected**: the release becomes ready using the default `ghcr.io/freinold/model2vec-serve` image. Re-running the workflow without a version change creates no new release and does not fail.
+**Expected**: the release becomes ready using the default `ghcr.io/it-at-m/model2vec-serve` image. Re-running the workflow without a version change creates no new release and does not fail.

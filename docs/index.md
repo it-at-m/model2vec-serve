@@ -17,7 +17,7 @@ hero:
       link: /api/openai
     - theme: alt
       text: View on GitHub
-      link: https://github.com/freinold/model2vec-serve
+      link: https://github.com/it-at-m/model2vec-serve
 
 features:
   - title: OpenAI Compatible
@@ -29,3 +29,16 @@ features:
   - title: Production Ready
     details: Structured JSON logs, Prometheus metrics, health/readiness probes, and a Helm chart.
 ---
+
+::: info Repository transfer
+This project moved from the personal account `freinold` to the
+[it-at-m](https://github.com/it-at-m) organization on 2026-11-19. The previous
+`freinold.github.io` documentation URL no longer resolves — update bookmarks to
+<https://it-at-m.github.io/model2vec-serve/>.
+:::
+
+Built on [model2vec](https://github.com/MinishLab/model2vec) by
+[Minish Lab](https://github.com/minishlab) — thank you
+[Stéphan Tulkens](https://github.com/stephantul) and
+[Thomas van Dongen](https://github.com/Pringled) for the great project and the
+continued work on static embedding models.

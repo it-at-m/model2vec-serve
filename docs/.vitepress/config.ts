@@ -53,7 +53,7 @@ export default defineConfig({
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/freinold/model2vec-serve' },
+      { icon: 'github', link: 'https://github.com/it-at-m/model2vec-serve' },
     ],
 
     footer: {
@@ -61,7 +61,7 @@ export default defineConfig({
     },
 
     editLink: {
-      pattern: 'https://github.com/freinold/model2vec-serve/edit/main/docs/:path',
+      pattern: 'https://github.com/it-at-m/model2vec-serve/edit/main/docs/:path',
       text: 'Edit this page on GitHub',
     },
 
