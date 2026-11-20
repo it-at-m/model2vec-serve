@@ -55,7 +55,7 @@ pub fn test_config(api_key: Option<String>) -> Config {
         model_alias: Vec::new(),
         api_key,
         max_batch_size: 32,
-        max_input_length: 512,
+        max_input_length: Some(512),
         log_level: "warn".to_string(),
         request_timeout_seconds: 30,
         tls_cert: None,
@@ -85,7 +85,7 @@ pub fn test_config_with_models(
         model_alias: Vec::new(),
         api_key,
         max_batch_size: 32,
-        max_input_length: 512,
+        max_input_length: Some(512),
         log_level: "warn".to_string(),
         request_timeout_seconds: 30,
         tls_cert: None,
@@ -110,7 +110,31 @@ pub fn test_config_with_aliases(
         model_alias,
         api_key,
         max_batch_size: 32,
-        max_input_length: 512,
+        max_input_length: Some(512),
+        log_level: "warn".to_string(),
+        request_timeout_seconds: 30,
+        tls_cert: None,
+        tls_key: None,
+    }
+}
+
+/// Build a test configuration without an explicit maximum input length so
+/// limits resolve per model from each model's `config.json` (spec 008).
+pub fn test_config_per_model(
+    models: Vec<String>,
+    default_model: Option<String>,
+    api_key: Option<String>,
+) -> Config {
+    Config {
+        host: "127.0.0.1".to_string(),
+        port: 0,
+        models,
+        default_model,
+        model_owner: "minishlab".to_string(),
+        model_alias: Vec::new(),
+        api_key,
+        max_batch_size: 32,
+        max_input_length: None,
         log_level: "warn".to_string(),
         request_timeout_seconds: 30,
         tls_cert: None,
@@ -172,6 +196,54 @@ pub fn alt_model_dir() -> String {
     }
 
     alt_dir.to_string_lossy().to_string()
+}
+
+/// Return a model directory copy whose `config.json` declares the given
+/// `max_length`.
+///
+/// The directory name (`model-256` for `256`) differs from the fixture
+/// snapshot directory, so the derived model id is distinct. The temporary
+/// directory is converted to a plain path and left for the test process to
+/// clean up. The source model's own `max_length` entry (if any) is removed
+/// first so the declared value is the only source for the resolved limit.
+pub fn model_dir_with_max_length(max_length: usize) -> String {
+    let source = model_dir();
+    let dir = tempfile::tempdir()
+        .expect("failed to create temp dir")
+        .keep();
+    let dir_name = format!("model-{max_length}");
+    let copy_dir = dir.join(&dir_name);
+    std::fs::create_dir_all(&copy_dir).expect("failed to create model dir");
+
+    for entry in std::fs::read_dir(&source).expect("failed to read model dir") {
+        let entry = entry.expect("failed to read dir entry");
+        let src = entry.path();
+        if src.is_file() {
+            let dst = copy_dir.join(src.file_name().expect("missing file name"));
+            std::fs::copy(&src, &dst).expect("failed to copy model file");
+        }
+    }
+
+    let config_path = copy_dir.join("config.json");
+    let mut config: serde_json::Value = serde_json::from_str(
+        &std::fs::read_to_string(&config_path).expect("failed to read config.json"),
+    )
+    .expect("failed to parse config.json");
+    let obj = config
+        .as_object_mut()
+        .expect("config.json must be an object");
+    obj.remove("max_length");
+    obj.insert(
+        "max_length".to_string(),
+        serde_json::Value::from(max_length),
+    );
+    std::fs::write(
+        &config_path,
+        serde_json::to_string_pretty(&config).expect("failed to serialize config.json"),
+    )
+    .expect("failed to write config.json");
+
+    copy_dir.to_string_lossy().to_string()
 }
 
 /// TLS certificate fixture: paths to a certificate/key pair plus the temporary

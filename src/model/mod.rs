@@ -2,6 +2,7 @@
 
 pub mod embedding;
 
+use crate::config::resolve_max_input_length;
 use crate::errors::AppError;
 use embedding::EmbeddingModel;
 use std::{collections::HashMap, path::Path, sync::Arc};
@@ -12,6 +13,9 @@ pub struct LoadedModel {
     /// Canonical identifier used for routing and responses.
     pub model_id: String,
     /// Maximum input length in tokens accepted by this model.
+    ///
+    /// Resolved per model: an explicit operator limit wins, otherwise the
+    /// model's `config.json` `max_length`, otherwise the crate default.
     pub max_input_length: usize,
     /// Embedding vector dimension produced by this model.
     pub embedding_dimension: usize,
@@ -24,13 +28,36 @@ pub struct LoadedModel {
 impl LoadedModel {
     /// Create a new loaded model from a path or Hugging Face identifier.
     ///
+    /// `explicit_max_input_length` is the operator-configured global limit;
+    /// when `None`, the limit resolves from the model's own configuration.
+    ///
     /// # Errors
     ///
     /// Returns an error if the model cannot be loaded from the given path.
-    pub fn load(path: &str, max_input_length: usize) -> anyhow::Result<Self> {
+    pub fn load(path: &str, explicit_max_input_length: Option<usize>) -> anyhow::Result<Self> {
         let model_id = derive_model_id(path);
         let model = Arc::new(EmbeddingModel::load(path)?);
         let embedding_dimension = model.dimension();
+
+        let model_max = model.max_length();
+        let max_input_length = resolve_max_input_length(explicit_max_input_length, model_max);
+        match (explicit_max_input_length, model_max) {
+            (Some(explicit), Some(configured)) if configured != explicit => {
+                tracing::warn!(
+                    model = %model_id,
+                    override = explicit,
+                    configured,
+                    "explicit --max-input-length replaces the model's configured max_length"
+                );
+            }
+            _ => {
+                tracing::info!(
+                    model = %model_id,
+                    max_input_length,
+                    "resolved model max input length"
+                );
+            }
+        }
 
         Ok(Self {
             model_id,
@@ -84,6 +111,10 @@ impl ModelRegistry {
     /// Models are loaded concurrently. Models that fail to load are recorded and
     /// skipped; the registry succeeds as long as at least one model loads.
     ///
+    /// `explicit_max_input_length` is the operator-configured global token
+    /// limit; when `None`, each model's limit resolves from its own
+    /// configuration (see [`LoadedModel::load`]).
+    ///
     /// # Errors
     ///
     /// Returns an error if no models are configured or if none of the configured
@@ -91,7 +122,7 @@ impl ModelRegistry {
     pub fn load(
         model_paths: &[String],
         default_model_id: Option<String>,
-        max_input_length: usize,
+        explicit_max_input_length: Option<usize>,
         model_alias: &[(String, String)],
     ) -> anyhow::Result<Self> {
         if model_paths.is_empty() {
@@ -106,7 +137,12 @@ impl ModelRegistry {
                 .iter()
                 .map(|path| {
                     let path = path.clone();
-                    s.spawn(move || (path.clone(), LoadedModel::load(&path, max_input_length)))
+                    s.spawn(move || {
+                        (
+                            path.clone(),
+                            LoadedModel::load(&path, explicit_max_input_length),
+                        )
+                    })
                 })
                 .collect();
 

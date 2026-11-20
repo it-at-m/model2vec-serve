@@ -50,7 +50,7 @@ fn bench_embeddings(c: &mut Criterion) {
         model_alias: Vec::new(),
         api_key: None,
         max_batch_size: 64,
-        max_input_length: 512,
+        max_input_length: Some(512),
         log_level: "warn".to_string(),
         request_timeout_seconds: 30,
         tls_cert: None,
@@ -72,7 +72,7 @@ fn bench_embeddings(c: &mut Criterion) {
     group.throughput(Throughput::Elements(inputs.len() as u64));
     group.bench_function("batch_of_64", |b| {
         b.iter(|| {
-            let result = model.encode(&inputs, 512, inputs.len());
+            let result = model.encode(&inputs, 512, inputs.len(), None);
             assert_eq!(result.len(), inputs.len());
         });
     });
@@ -84,7 +84,7 @@ fn bench_embeddings(c: &mut Criterion) {
                 .expect("per-model path identifier must resolve to a loaded model");
             let result = loaded
                 .model
-                .encode(&inputs, loaded.max_input_length, inputs.len());
+                .encode(&inputs, loaded.max_input_length, inputs.len(), None);
             assert_eq!(result.len(), inputs.len());
         });
     });

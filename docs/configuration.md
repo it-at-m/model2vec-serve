@@ -17,7 +17,7 @@ a corresponding environment variable.
 | `--tls-cert` | `TLS_CERT` | none | Path to the PEM TLS certificate (leaf plus optional chain); enables HTTPS when combined with `--tls-key` |
 | `--tls-key` | `TLS_KEY` | none | Path to the unencrypted PEM private key matching `--tls-cert` |
 | `--max-batch-size` | `MAX_BATCH_SIZE` | `256` | Maximum inputs per request |
-| `--max-input-length` | `MAX_INPUT_LENGTH` | `512` | Maximum tokens per input |
+| `--max-input-length` | `MAX_INPUT_LENGTH` | *(unset → per model)* | Maximum tokens per input; when set it overrides every model, when unset each model uses its own `config.json` `max_length` (fallback `512`) |
 | `--log-level` | `LOG_LEVEL` | `info` | Log level (e.g. `trace`, `debug`, `info`, `warn`, `error`) |
 | `--request-timeout-seconds` | `REQUEST_TIMEOUT_SECONDS` | `30` | Per-request timeout |
 

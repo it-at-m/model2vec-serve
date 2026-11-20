@@ -183,7 +183,7 @@ are never injected into the container as empty strings.
 | `MODEL_OWNER` | service | `minishlab` (service default) | Owner shown in `/v1/models` |
 | `MODEL_ALIAS` | service | *(unset)* | `KEY=ALIAS` pairs for `/tei/{model_id}/...` paths |
 | `MAX_BATCH_SIZE` | service | `256` (service default) | Max inputs per request |
-| `MAX_INPUT_LENGTH` | service | `512` (service default) | Max tokens per input |
+| `MAX_INPUT_LENGTH` | service | *(unset → per model)* | Max tokens per input; when set it overrides every model, when unset each model uses its own `config.json` `max_length` (fallback `512`) |
 | `LOG_LEVEL` | service | `info` (service default) | Log verbosity |
 | `REQUEST_TIMEOUT_SECONDS` | service | `30` (service default) | Per-request timeout |
 

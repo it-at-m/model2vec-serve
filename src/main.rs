@@ -14,6 +14,9 @@ use std::sync::Arc;
 async fn main() -> anyhow::Result<()> {
     let config = Config::parse();
     telemetry::init_tracing(&config.log_level);
+    config
+        .validate()
+        .map_err(|message| anyhow::Error::msg(message).context("invalid service configuration"))?;
 
     let metrics_handle = Arc::new(telemetry::init_metrics());
     let state = AppState::new(config.clone(), metrics_handle)?;

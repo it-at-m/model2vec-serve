@@ -83,7 +83,7 @@ All configuration is passed as command-line arguments:
 | `--port` | `8080` | Listen port |
 | `--api-key` | none | Enables Bearer token authentication |
 | `--max-batch-size` | `256` | Maximum inputs per request |
-| `--max-input-length` | `512` | Maximum tokens per input |
+| `--max-input-length` | *(unset → per model)* | Maximum tokens per input; when unset each model uses its own `config.json` `max_length` (fallback `512`) |
 | `--log-level` | `info` | Log level |
 | `--request-timeout-seconds` | `30` | Per-request timeout |
 | `--tls-cert` / `--tls-key` | none | PEM certificate and matching private key file paths; providing both enables HTTPS on the same port (single listener) |

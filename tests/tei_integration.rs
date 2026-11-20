@@ -9,7 +9,9 @@ use axum::{
     body::Body,
     http::{Request, StatusCode},
 };
-use common::{alt_model_dir, metrics_handle, model_dir, test_app, test_app_with_models};
+use common::{
+    alt_model_dir, metrics_handle, model_dir, test_app, test_app_with_models, test_app_with_state,
+};
 use http_body_util::BodyExt;
 use model2vec_serve::{config::Config, routes::app, state::AppState};
 use serde_json::{Value, json};
@@ -129,7 +131,7 @@ async fn root_embed_without_qualifier_serves_default_model() {
         model_alias: Vec::new(),
         api_key: None,
         max_batch_size: 32,
-        max_input_length: 512,
+        max_input_length: Some(512),
         log_level: "warn".to_string(),
         request_timeout_seconds: 30,
         tls_cert: None,
@@ -163,4 +165,78 @@ async fn root_embed_without_qualifier_serves_default_model() {
         expected_dimension,
         "root /embed vector length should match the default model's embedding dimension"
     );
+}
+
+// Per-request `normalize` behavior (spec 008, contracts/tei.md).
+
+async fn embed_norm(uri: &str, normalize: Option<bool>) -> f64 {
+    let mut body = json!({"inputs": "the quick brown fox jumps over the lazy dog"});
+    if let Some(normalize) = normalize {
+        body["normalize"] = json!(normalize);
+    }
+    let app = test_app(None).await;
+    let response = app
+        .oneshot(
+            Request::builder()
+                .method("POST")
+                .uri(uri)
+                .header("Content-Type", "application/json")
+                .body(Body::from(body.to_string()))
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+    let body = response.into_body().collect().await.unwrap().to_bytes();
+    let value: Value = serde_json::from_slice(&body).unwrap();
+    value[0]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|v| v.as_f64().unwrap() * v.as_f64().unwrap())
+        .sum::<f64>()
+        .sqrt()
+}
+
+#[tokio::test]
+async fn normalize_true_yields_unit_norm() {
+    let norm = embed_norm("/embed", Some(true)).await;
+    assert!(
+        (norm - 1.0).abs() < 1e-2,
+        "normalize=true should yield unit norm, got {norm}"
+    );
+}
+
+#[tokio::test]
+async fn normalize_false_differs_from_true() {
+    let normalized = embed_norm("/embed", Some(true)).await;
+    let raw = embed_norm("/embed", Some(false)).await;
+    assert!(
+        (normalized - raw).abs() > 1e-4,
+        "norms should differ between normalize=true ({normalized}) and false ({raw})"
+    );
+}
+
+#[tokio::test]
+async fn normalize_absent_matches_model_default() {
+    // potion-base-2M normalizes by default, so omitting the field must equal
+    // the normalize=true norm.
+    let absent = embed_norm("/embed", None).await;
+    let normalized = embed_norm("/embed", Some(true)).await;
+    assert!(
+        (absent - normalized).abs() < 1e-6,
+        "absent normalize should use the model default (normalized): {absent} vs {normalized}"
+    );
+}
+
+#[tokio::test]
+async fn per_model_embed_honors_normalize() {
+    let (_app, state) = test_app_with_state(None).await;
+    let path_id = state
+        .registry
+        .path_identifier_for(state.registry.default_model_id())
+        .unwrap()
+        .to_string();
+    let normalized = embed_norm(&format!("/tei/{path_id}/embed"), Some(true)).await;
+    assert!((normalized - 1.0).abs() < 1e-2);
 }
