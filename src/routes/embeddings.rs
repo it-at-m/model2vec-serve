@@ -54,7 +54,7 @@ pub async fn create_embeddings(
     let inputs = request.input.as_strings();
     let embeddings = loaded
         .model
-        .encode(&inputs, loaded.max_input_length, inputs.len());
+        .encode(&inputs, loaded.max_input_length, inputs.len(), None);
 
     let data: Vec<EmbeddingObject> = embeddings
         .into_iter()

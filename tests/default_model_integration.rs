@@ -104,7 +104,7 @@ async fn root_endpoints_remain_available_in_multi_model_deployment() {
         model_alias: Vec::new(),
         api_key: None,
         max_batch_size: 32,
-        max_input_length: 512,
+        max_input_length: Some(512),
         log_level: "warn".to_string(),
         request_timeout_seconds: 30,
         tls_cert: None,

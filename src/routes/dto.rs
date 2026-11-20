@@ -116,6 +116,14 @@ pub struct TeiEmbedRequest {
     /// Input text or list of texts.
     #[schema(value_type = Object, example = json!("Hello world"))]
     pub inputs: EmbeddingInput,
+
+    /// Whether to L2-normalize the returned embeddings.
+    ///
+    /// `None` (absent or `null`) keeps the model's configured normalization;
+    /// `true` forces L2 normalization, `false` returns the raw pooled sums.
+    #[serde(default)]
+    #[schema(required = false, example = true)]
+    pub normalize: Option<bool>,
 }
 
 /// TEI-compatible model information response.
@@ -123,12 +131,14 @@ pub struct TeiEmbedRequest {
 pub struct ModelInfo {
     /// Model identifier.
     pub model_id: String,
-    /// Maximum input length in tokens.
+    /// Maximum input length in tokens, resolved per model.
     pub max_input_length: usize,
     /// Embedding vector dimension.
     pub embedding_dimension: usize,
     /// Pooling method.
     pub pooling: &'static str,
+    /// Whether the model L2-normalizes its embeddings by default.
+    pub normalize: bool,
 }
 
 /// OpenAI-compatible model object returned by `/v1/models`.

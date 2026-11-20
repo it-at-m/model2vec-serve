@@ -6,7 +6,7 @@ mod common;
 // Unit tests for configuration parsing.
 
 use clap::{CommandFactory, Parser};
-use model2vec_serve::config::Config;
+use model2vec_serve::config::{Config, resolve_max_input_length};
 
 const DEFAULT_MODEL: &str = "minishlab/blink-multilingual-64M";
 const CODE_MODEL: &str = "minishlab/potion-code-16M-v2";
@@ -22,7 +22,7 @@ fn default_values_are_reasonable() {
         model_alias: Vec::new(),
         api_key: None,
         max_batch_size: 256,
-        max_input_length: 512,
+        max_input_length: Some(512),
         log_level: "info".to_string(),
         request_timeout_seconds: 30,
         tls_cert: None,
@@ -40,6 +40,83 @@ fn parse_empty_cli_args_uses_default_model() {
 
     assert_eq!(config.models, vec![DEFAULT_MODEL]);
     assert_eq!(config.default_model(), Some(DEFAULT_MODEL.to_string()));
+}
+
+// Maximum input length configuration (spec 008).
+
+#[test]
+fn max_input_length_defaults_to_unset() {
+    let config = Config::parse_from(Vec::<&str>::new());
+
+    assert_eq!(config.max_input_length, None);
+}
+
+#[test]
+fn parse_max_input_length_flag() {
+    let config = Config::parse_from(["model2vec-serve", "--max-input-length", "256"]);
+
+    assert_eq!(config.max_input_length, Some(256));
+}
+
+#[test]
+fn zero_max_input_length_is_rejected() {
+    let config = Config {
+        host: "0.0.0.0".to_string(),
+        port: 8080,
+        models: vec![DEFAULT_MODEL.to_string()],
+        default_model: None,
+        model_owner: "minishlab".to_string(),
+        model_alias: Vec::new(),
+        api_key: None,
+        max_batch_size: 256,
+        max_input_length: Some(0),
+        log_level: "info".to_string(),
+        request_timeout_seconds: 30,
+        tls_cert: None,
+        tls_key: None,
+    };
+
+    let err = config.validate().unwrap_err();
+    assert!(err.contains("--max-input-length"));
+}
+
+#[test]
+fn positive_max_input_length_passes_validation() {
+    let config = Config {
+        host: "0.0.0.0".to_string(),
+        port: 8080,
+        models: vec![DEFAULT_MODEL.to_string()],
+        default_model: None,
+        model_owner: "minishlab".to_string(),
+        model_alias: Vec::new(),
+        api_key: None,
+        max_batch_size: 256,
+        max_input_length: Some(512),
+        log_level: "info".to_string(),
+        request_timeout_seconds: 30,
+        tls_cert: None,
+        tls_key: None,
+    };
+
+    config.validate().expect("positive limit is valid");
+}
+
+#[test]
+fn resolution_explicit_override_wins() {
+    assert_eq!(resolve_max_input_length(Some(128), Some(256)), 128);
+    assert_eq!(resolve_max_input_length(Some(128), None), 128);
+}
+
+#[test]
+fn resolution_model_config_used_when_unset() {
+    assert_eq!(resolve_max_input_length(None, Some(256)), 256);
+}
+
+#[test]
+fn resolution_falls_back_to_default() {
+    // Absent model config resolves to Some(512) in model2vec-rs; a declared
+    // `max_length: null` surfaces as `None`. Both fall back to 512.
+    assert_eq!(resolve_max_input_length(None, None), 512);
 }
 
 #[test]

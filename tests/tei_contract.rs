@@ -518,3 +518,127 @@ async fn tei_per_model_info_matches_root_info_for_default() {
     );
     assert_eq!(per_model["pooling"], root["pooling"]);
 }
+
+// `normalize` request field (spec 008, contracts/tei.md).
+
+async fn post_embed(app: axum::Router, uri: &str, body: Value) -> (StatusCode, Value) {
+    let response = app
+        .oneshot(
+            Request::builder()
+                .method("POST")
+                .uri(uri)
+                .header("Content-Type", "application/json")
+                .body(Body::from(body.to_string()))
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    let status = response.status();
+    let bytes = response.into_body().collect().await.unwrap().to_bytes();
+    (status, serde_json::from_slice(&bytes).unwrap())
+}
+
+#[tokio::test]
+async fn tei_embed_accepts_normalize_false() {
+    let app = test_app(None).await;
+    let (status, value) = post_embed(
+        app,
+        "/embed",
+        json!({"inputs": "hello", "normalize": false}),
+    )
+    .await;
+
+    assert_eq!(status, StatusCode::OK);
+    assert!(value.is_array());
+    assert_eq!(value.as_array().unwrap().len(), 1);
+}
+
+#[tokio::test]
+async fn tei_embed_accepts_normalize_true() {
+    let app = test_app(None).await;
+    let (status, value) =
+        post_embed(app, "/embed", json!({"inputs": "hello", "normalize": true})).await;
+
+    assert_eq!(status, StatusCode::OK);
+    assert!(value.is_array());
+}
+
+#[tokio::test]
+async fn tei_embed_accepts_normalize_null() {
+    let app = test_app(None).await;
+    let (status, value) =
+        post_embed(app, "/embed", json!({"inputs": "hello", "normalize": null})).await;
+
+    assert_eq!(status, StatusCode::OK);
+    assert!(value.is_array());
+}
+
+#[tokio::test]
+async fn tei_per_model_embed_accepts_normalize() {
+    let (app, state) = test_app_with_state(None).await;
+    let path_id = state
+        .registry
+        .path_identifier_for(state.registry.default_model_id())
+        .unwrap()
+        .to_string();
+    let (status, value) = post_embed(
+        app,
+        &format!("/tei/{path_id}/embed"),
+        json!({"inputs": "hello", "normalize": false}),
+    )
+    .await;
+
+    assert_eq!(status, StatusCode::OK);
+    assert!(value.is_array());
+}
+
+// `/info` normalization metadata (spec 008, contracts/tei.md).
+
+#[tokio::test]
+async fn tei_info_reports_normalize_flag() {
+    let app = test_app(None).await;
+
+    let response = app
+        .oneshot(
+            Request::builder()
+                .method("GET")
+                .uri("/info")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::OK);
+    let body = response.into_body().collect().await.unwrap().to_bytes();
+    let value: Value = serde_json::from_slice(&body).unwrap();
+    assert!(value["normalize"].is_boolean());
+}
+
+#[tokio::test]
+async fn tei_per_model_info_reports_normalize_flag() {
+    let (app, state) = test_app_with_state(None).await;
+    let path_id = state
+        .registry
+        .path_identifier_for(state.registry.default_model_id())
+        .unwrap()
+        .to_string();
+
+    let response = app
+        .oneshot(
+            Request::builder()
+                .method("GET")
+                .uri(format!("/tei/{path_id}/info"))
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::OK);
+    let body = response.into_body().collect().await.unwrap().to_bytes();
+    let value: Value = serde_json::from_slice(&body).unwrap();
+    assert!(value["normalize"].is_boolean());
+    // potion-base-2M normalizes by default.
+    assert_eq!(value["normalize"], true);
+}

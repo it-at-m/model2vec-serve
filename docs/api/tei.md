@@ -22,11 +22,15 @@ model. Takes no query parameters.
 
 ```json
 {
-  "inputs": "Hello world"
+  "inputs": "Hello world",
+  "normalize": true
 }
 ```
 
-`inputs` may be a single string or a list of strings.
+`inputs` may be a single string or a list of strings. The optional `normalize`
+boolean controls L2 normalization for this request: `true` forces normalized
+embeddings, `false` returns the raw pooled sums, and omitting the field (or
+passing `null`) keeps the model's configured normalization.
 
 ### Response
 
@@ -47,6 +51,7 @@ same order.
 - Batch size must not exceed `--max-batch-size`.
 - Token arrays are not supported and return `400 Bad Request`.
 - The retired `model` query parameter is rejected with `400 invalid_request`.
+- `normalize` accepts any boolean or `null`; there is no error case for it.
 
 ## `GET /info`
 
@@ -61,7 +66,8 @@ Returns metadata for the configured default model. Takes no query parameters.
   "model_id": "minishlab/blink-multilingual-64M",
   "max_input_length": 512,
   "embedding_dimension": 384,
-  "pooling": "mean"
+  "pooling": "mean",
+  "normalize": true
 }
 ```
 
@@ -70,9 +76,14 @@ Returns metadata for the configured default model. Takes no query parameters.
 | Field | Type | Description |
 |-------|------|-------------|
 | `model_id` | `string` | Canonical model identifier |
-| `max_input_length` | `number` | Maximum tokens accepted per input |
+| `max_input_length` | `number` | Maximum tokens accepted per input, resolved per model (see below) |
 | `embedding_dimension` | `number` | Size of each embedding vector |
 | `pooling` | `string` | Pooling method used by the model |
+| `normalize` | `boolean` | Whether the model L2-normalizes its embeddings by default |
+
+`max_input_length` resolves per model: an explicit `--max-input-length`
+override wins; otherwise the model's own `config.json` `max_length` applies;
+otherwise the default of `512` is used.
 
 ## `POST /tei/{model_id}/embed`
 
@@ -126,7 +137,8 @@ Returns TEI info for exactly the model addressed by the path.
   "model_id": "minishlab/blink-multilingual-64M",
   "max_input_length": 512,
   "embedding_dimension": 384,
-  "pooling": "mean"
+  "pooling": "mean",
+  "normalize": true
 }
 ```
 

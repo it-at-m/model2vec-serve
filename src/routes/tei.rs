@@ -89,9 +89,12 @@ pub async fn tei_embed(
 
     let loaded = state.registry.resolve(None)?;
     let inputs = request.inputs.as_strings();
-    let embeddings = loaded
-        .model
-        .encode(&inputs, loaded.max_input_length, inputs.len());
+    let embeddings = loaded.model.encode(
+        &inputs,
+        loaded.max_input_length,
+        inputs.len(),
+        request.normalize,
+    );
 
     model_id_ext.set(loaded.model_id.clone());
 
@@ -142,9 +145,12 @@ pub async fn tei_per_model_embed(
         .ok_or_else(|| AppError::ModelRouteNotFound(path_id.clone()))?;
 
     let inputs = request.inputs.as_strings();
-    let embeddings = loaded
-        .model
-        .encode(&inputs, loaded.max_input_length, inputs.len());
+    let embeddings = loaded.model.encode(
+        &inputs,
+        loaded.max_input_length,
+        inputs.len(),
+        request.normalize,
+    );
 
     model_id_ext.set(loaded.model_id.clone());
 
@@ -177,6 +183,7 @@ pub async fn tei_info(
         max_input_length: loaded.max_input_length,
         embedding_dimension: loaded.embedding_dimension,
         pooling: loaded.pooling,
+        normalize: loaded.model.normalize(),
     }))
 }
 
@@ -224,5 +231,6 @@ pub async fn tei_per_model_info(
         max_input_length: loaded.max_input_length,
         embedding_dimension: loaded.embedding_dimension,
         pooling: loaded.pooling,
+        normalize: loaded.model.normalize(),
     }))
 }

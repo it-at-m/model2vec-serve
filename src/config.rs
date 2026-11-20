@@ -3,6 +3,10 @@
 use clap::Parser;
 use std::path::PathBuf;
 
+/// Fallback maximum input length used when neither the operator nor the
+/// model's `config.json` declares a limit.
+pub const DEFAULT_MAX_INPUT_LENGTH: usize = 512;
+
 /// Configuration for the model2vec-serve HTTP server.
 #[derive(Parser, Clone, Debug)]
 #[command(name = "model2vec-serve", version, about)]
@@ -61,8 +65,13 @@ pub struct Config {
     pub max_batch_size: usize,
 
     /// Maximum tokens per input string.
-    #[arg(long, default_value_t = 512, env = "MAX_INPUT_LENGTH")]
-    pub max_input_length: usize,
+    ///
+    /// When set (explicitly via `--max-input-length` or `MAX_INPUT_LENGTH`),
+    /// the value overrides every model's configured limit. When unset, each
+    /// model's limit resolves from its own `config.json` `max_length`,
+    /// falling back to [`DEFAULT_MAX_INPUT_LENGTH`].
+    #[arg(long, env = "MAX_INPUT_LENGTH")]
+    pub max_input_length: Option<usize>,
 
     /// Log level (e.g., trace, debug, info, warn, error).
     #[arg(long, default_value = "info", env = "LOG_LEVEL")]
@@ -143,7 +152,36 @@ fn parse_model_alias(pair: &str) -> Result<(String, String), String> {
     Ok((key.to_string(), alias.to_string()))
 }
 
+/// Resolve the effective maximum input length for a single model.
+///
+/// Precedence (spec 008, `contracts/config.md`):
+///
+/// 1. An explicit operator limit wins over any model configuration.
+/// 2. Otherwise the model's configured `max_length` (`config.json`) is used.
+/// 3. Otherwise [`DEFAULT_MAX_INPUT_LENGTH`] applies; a model that declares
+///    no limit never runs with unbounded truncation.
+#[must_use]
+pub fn resolve_max_input_length(explicit: Option<usize>, model_max: Option<usize>) -> usize {
+    explicit.or(model_max).unwrap_or(DEFAULT_MAX_INPUT_LENGTH)
+}
+
 impl Config {
+    /// Validate cross-field configuration rules.
+    ///
+    /// # Errors
+    ///
+    /// Returns a message describing the first validation failure.
+    pub fn validate(&self) -> Result<(), String> {
+        if self.max_input_length == Some(0) {
+            return Err(
+                "--max-input-length must be greater than zero; a zero token limit cannot produce embeddings"
+                    .to_string(),
+            );
+        }
+
+        Ok(())
+    }
+
     /// Returns the socket address the server should bind to.
     #[must_use]
     pub fn bind_address(&self) -> String {
