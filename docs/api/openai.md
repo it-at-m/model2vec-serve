@@ -34,6 +34,33 @@ POST /v1/embeddings
 | `model` | `string` | no | Must match the loaded model id |
 | `encoding_format` | `string` | no | `"float"` or `"base64"`; defaults to `"float"` |
 
+### Optional headers (service-specific extension)
+
+`model2vec-serve` supports one additional request header that is **not** part
+of the OpenAI contract:
+
+| Header | Value | Effect |
+|--------|-------|--------|
+| `X-Normalize` | (absent) | Model's configured normalization default — identical to the pre-extension behavior |
+| `X-Normalize` | `true` (case-insensitive) | Embeddings are L2-normalized; each vector has length ≈ 1.0 |
+| `X-Normalize` | `false` (case-insensitive) | Embeddings are the raw mean-pooled vectors |
+| anything else | — | `400 invalid_request` with the standard error body |
+
+Example:
+
+```bash
+curl -X POST http://localhost:8080/v1/embeddings \
+  -H 'Content-Type: application/json' \
+  -H 'X-Normalize: false' \
+  -d '{"input": "Hello world"}'
+```
+
+Duplicate `X-Normalize` values in one request are also rejected with
+`400 invalid_request`. The header has no effect on the TEI-compatible
+endpoints, which accept a `normalize` body field instead. This extension is
+documented as an approved deviation from the OpenAI contract in
+`specs/009-openai-normalize-header/contracts/openai_embeddings.md`.
+
 ## Response
 
 ### Status
