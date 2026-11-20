@@ -39,15 +39,16 @@ impl EmbeddingModel {
             return Vec::new();
         }
 
+        // `None` keeps the model's configured L2-normalization behavior.
         self.inner
-            .encode_with_args(inputs, Some(max_length), batch_size)
+            .encode_with_args(inputs, Some(max_length), batch_size, None)
     }
 
     /// Encode a single input string.
     #[must_use]
     pub fn encode_single(&self, input: &str, max_length: usize) -> Vec<f32> {
         self.inner
-            .encode_with_args(&[input.to_owned()], Some(max_length), 1)
+            .encode_with_args(&[input.to_owned()], Some(max_length), 1, None)
             .into_iter()
             .next()
             .unwrap_or_default()
