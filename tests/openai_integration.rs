@@ -157,3 +157,86 @@ async fn model_selection_reflects_requested_model_or_default() {
     let value: Value = serde_json::from_slice(&body).unwrap();
     assert_eq!(value["model"], model_id);
 }
+
+// `X-Normalize` request header behavior (spec 009, contracts/openai_embeddings.md).
+
+async fn embeddings_vector(app: axum::Router, normalize: Option<&str>) -> Vec<f64> {
+    let model_id = {
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("GET")
+                    .uri("/v1/models")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        let body = response.into_body().collect().await.unwrap().to_bytes();
+        let value: Value = serde_json::from_slice(&body).unwrap();
+        value["data"][0]["id"].as_str().unwrap().to_string()
+    };
+
+    let mut builder = Request::builder()
+        .method("POST")
+        .uri("/v1/embeddings")
+        .header("Content-Type", "application/json");
+    if let Some(normalize) = normalize {
+        builder = builder.header("X-Normalize", normalize);
+    }
+    let response = app
+        .oneshot(
+            builder
+                .body(Body::from(json!({"input": ["the quick brown fox jumps over the lazy dog"], "model": model_id}).to_string()))
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+    let body = response.into_body().collect().await.unwrap().to_bytes();
+    let value: Value = serde_json::from_slice(&body).unwrap();
+    value["data"][0]["embedding"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|v| v.as_f64().unwrap())
+        .collect()
+}
+
+fn l2_norm(vector: &[f64]) -> f64 {
+    vector.iter().map(|v| v * v).sum::<f64>().sqrt()
+}
+
+#[tokio::test]
+async fn normalize_header_true_yields_unit_norm() {
+    let app = test_app(None).await;
+    let vector = embeddings_vector(app, Some("true")).await;
+    let norm = l2_norm(&vector);
+    assert!((norm - 1.0).abs() < 1e-2, "expected unit norm, got {norm}");
+}
+
+#[tokio::test]
+async fn normalize_header_true_and_false_differ() {
+    let app = test_app(None).await;
+    let normalized = l2_norm(&embeddings_vector(app.clone(), Some("true")).await);
+    let raw = l2_norm(&embeddings_vector(app, Some("false")).await);
+    assert!(
+        (normalized - raw).abs() > 1e-4,
+        "norms should differ between true ({normalized}) and false ({raw})"
+    );
+}
+
+#[tokio::test]
+async fn normalize_header_is_case_insensitive() {
+    let app = test_app(None).await;
+    let canonical = embeddings_vector(app.clone(), Some("false")).await;
+    let mixed = embeddings_vector(app, Some("fAlSe")).await;
+    assert!(
+        canonical
+            .iter()
+            .zip(mixed.iter())
+            .all(|(a, b)| (a - b).abs() < 1e-9),
+        "mixed-case value must behave like the canonical spelling"
+    );
+}

@@ -51,6 +51,18 @@ curl -X POST http://localhost:8080/v1/embeddings \
   -d '{"input":"def hello(): pass","model":"minishlab/potion-code-16M-v2"}'
 ```
 
+Control normalization per request with the optional `X-Normalize` header
+(a documented service extension; the OpenAI JSON contract is unchanged) —
+`true` forces L2-normalized embeddings, `false` returns raw mean-pooled
+vectors, and omitting it keeps the model's default:
+
+```bash
+curl -X POST http://localhost:8080/v1/embeddings \
+  -H "Content-Type: application/json" \
+  -H "X-Normalize: false" \
+  -d '{"input":"Hello world"}'
+```
+
 ## TEI per-model endpoints
 
 TEI clients serving multiple models address a model explicitly through

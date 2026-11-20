@@ -29,7 +29,7 @@ use crate::{
     telemetry::request_tracing_middleware,
 };
 use axum::{
-    Router,
+    Json, Router,
     http::StatusCode,
     middleware,
     routing::{get, post},
@@ -77,6 +77,15 @@ use utoipa_scalar::{Scalar, Servable};
 )]
 pub struct ApiDoc;
 
+/// Serve the `OpenAPI` specification as JSON.
+///
+/// Complements the Scalar UI at `/docs` with a machine-readable spec at
+/// `/docs/openapi.json`, so the documented API surface (including service
+/// extensions such as the `X-Normalize` header) is directly inspectable.
+async fn openapi_json() -> Json<utoipa::openapi::OpenApi> {
+    Json(ApiDoc::openapi())
+}
+
 /// Build the application router.
 pub fn app(state: Arc<AppState>) -> Router {
     let api = Router::new()
@@ -102,6 +111,7 @@ pub fn app(state: Arc<AppState>) -> Router {
         .route("/ready", get(ready))
         .route("/metrics", get(metrics))
         .merge(Scalar::with_url("/docs", ApiDoc::openapi()))
+        .route("/docs/openapi.json", get(openapi_json))
         .layer(
             tower::ServiceBuilder::new()
                 .layer(TraceLayer::new_for_http())
