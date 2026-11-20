@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.2](https://github.com/it-at-m/model2vec-serve/compare/v0.7.1...v0.7.2) - 2026-11-20
+
+### Fixed
+
+- *(deps)* adapt to model2vec-rs 0.5 encode_with_args signature
+- *(deps)* update rust dependencies
+
+### Other
+
+- Merge pull request #172 from it-at-m/renovate/lock-file-maintenance
+
 ## [0.7.1](https://github.com/it-at-m/model2vec-serve/compare/v0.7.0...v0.7.1) - 2026-11-19
 
 ### Fixed
