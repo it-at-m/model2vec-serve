@@ -105,11 +105,19 @@ Any static model2vec model from the
 [minishlab Hugging Face org](https://huggingface.co/minishlab) works. Good
 starting points:
 
-| Model | Footprint | Best for |
-|-------|-----------|----------|
+| Model | Download | Best for |
+|-------|----------|----------|
 | `minishlab/blink-multilingual-64M` | ~256 MB | Default — 100+ languages, strongest multilingual quality |
 | `minishlab/blink-8M` | ~31 MB | English-only deployments at minimal footprint |
 | `minishlab/potion-code-16M-v2` | ~33 MB | Source code (Python, Java, JavaScript, Go, PHP, Ruby) |
+
+Download size ≠ resident memory: models are fully loaded at startup, and
+FP16 models (like `potion-code-16M-v2`) are converted to F32, roughly
+doubling their memory footprint.
+
+See the
+[model guide](https://it-at-m.github.io/model2vec-serve/models) for the full
+catalog, benchmarks, and a detailed choosing guide.
 
 Models load from the Hugging Face Hub at startup, or from a local path for
 air-gapped setups.
