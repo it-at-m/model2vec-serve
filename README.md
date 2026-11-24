@@ -111,6 +111,8 @@ starting points:
 | `minishlab/blink-8M` | ~31 MB | English-only deployments at minimal footprint |
 | `minishlab/blink-code-16M` | ~64 MB | Source code (Go, Java, JavaScript, PHP, Python, Ruby) |
 | `minishlab/potion-code-16M-v2` | ~33 MB | Superseded by `blink-code-16M` — kept for existing setups |
+| `minishlab/potion-base-8M` | ~31 MB | Superseded by `blink-8M` — kept for existing setups |
+| `minishlab/potion-multilingual-128M` | ~512 MB | Superseded by `blink-multilingual-64M` — kept for existing setups |
 
 Models load from the Hugging Face Hub at startup, or from a local path for
 air-gapped setups.

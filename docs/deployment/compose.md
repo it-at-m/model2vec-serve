@@ -104,7 +104,7 @@ For example, serving a single smaller model:
 
 ```bash
 cp .env.example .env
-# in .env: MODEL=minishlab/potion-base-2M and DEFAULT_MODEL=minishlab/potion-base-2M
+# in .env: MODEL=minishlab/blink-8M and DEFAULT_MODEL=minishlab/blink-8M
 docker compose up -d
 ```
 

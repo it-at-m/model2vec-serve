@@ -53,9 +53,9 @@ not specify a model:
 
 ```bash
 helm install model2vec-serve ./charts/model2vec-serve \
-  --set models[0]=minishlab/potion-base-2M \
+  --set models[0]=minishlab/blink-8M \
   --set models[1]=minishlab/blink-multilingual-64M \
-  --set defaultModel=minishlab/potion-base-2M \
+  --set defaultModel=minishlab/blink-8M \
   --set apiKey=your-secret-key
 ```
 
