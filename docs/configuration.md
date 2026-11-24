@@ -45,7 +45,7 @@ cargo run --release -- \
 ```bash
 cargo run --release -- \
   --model minishlab/blink-multilingual-64M \
-  --model minishlab/potion-code-16M-v2 \
+  --model minishlab/blink-code-16M \
   --default-model minishlab/blink-multilingual-64M \
   --port 8080
 ```
@@ -53,7 +53,7 @@ cargo run --release -- \
 The `MODEL` environment variable accepts a comma-separated list:
 
 ```bash
-MODEL=minishlab/blink-multilingual-64M,minishlab/potion-code-16M-v2 \
+MODEL=minishlab/blink-multilingual-64M,minishlab/blink-code-16M \
 DEFAULT_MODEL=minishlab/blink-multilingual-64M \
 cargo run --release
 ```
@@ -62,14 +62,14 @@ cargo run --release
 
 The `/tei/{model_id}/...` endpoints select a model by its path identifier. By
 default this is the last segment of the model identifier (e.g.
-`minishlab/potion-code-16M-v2` → `potion-code-16M-v2`). Override it with
+`minishlab/blink-code-16M` → `blink-code-16M`). Override it with
 `--model-alias KEY=ALIAS`:
 
 ```bash
 cargo run --release -- \
   --model minishlab/blink-multilingual-64M \
-  --model /models/potion-code-16M-v2 \
-  --model-alias /models/potion-code-16M-v2=code \
+  --model /models/blink-code-16M \
+  --model-alias /models/blink-code-16M=code \
   --port 8080
 ```
 
@@ -77,7 +77,7 @@ The `MODEL_ALIAS` environment variable accepts multiple `KEY=ALIAS` pairs as a
 comma-separated list:
 
 ```bash
-MODEL_ALIAS=/models/potion-code-16M-v2=code \
+MODEL_ALIAS=/models/blink-code-16M=code \
 cargo run --release
 ```
 
@@ -150,7 +150,7 @@ In Helm, use `--set` with the published chart:
 ```bash
 helm install model2vec-serve \
   oci://ghcr.io/it-at-m/helm-charts/model2vec-serve \
-  --set models={minishlab/blink-multilingual-64M,minishlab/potion-code-16M-v2} \
+  --set models={minishlab/blink-multilingual-64M,minishlab/blink-code-16M} \
   --set defaultModel=minishlab/blink-multilingual-64M \
   --set apiKey=my-secret-key \
   --set args[0]=--max-batch-size \

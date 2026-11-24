@@ -79,10 +79,10 @@ grep -q 'image: ghcr.io/it-at-m/model2vec-serve:latest' "$TMP" \
 pass "default image is ghcr.io/it-at-m/model2vec-serve:latest"
 
 grep -q \
-    'MODEL: minishlab/blink-multilingual-64M,minishlab/potion-code-16M-v2' \
+    'MODEL: minishlab/blink-multilingual-64M,minishlab/blink-code-16M' \
     "$TMP" \
     || fail "MODEL does not contain exactly the two default models"
-pass "MODEL serves multilingual (first/default) + code-v2"
+pass "MODEL serves multilingual (first/default) + blink-code-16M"
 
 grep -q 'DEFAULT_MODEL: null' "$TMP" \
     || fail "DEFAULT_MODEL must not be pinned (default = first MODEL entry)"

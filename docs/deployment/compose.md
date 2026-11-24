@@ -3,7 +3,7 @@
 The repository ships a `docker-compose.yml` at its root that starts
 `model2vec-serve` as a single local container serving **two** models:
 `minishlab/blink-multilingual-64M` (the default model) and
-`minishlab/potion-code-16M-v2`. The stack runs the published image
+`minishlab/blink-code-16M`. The stack runs the published image
 `ghcr.io/it-at-m/model2vec-serve:latest` (pushed to the GitHub Container
 Registry on every release), so no build step is required — one command starts
 the whole stack. This path targets local evaluation, development, and demos;
@@ -47,7 +47,7 @@ curl -s http://localhost:8080/v1/models | jq .
 ```
 
 Expected: a standard OpenAI model list containing both
-`minishlab/blink-multilingual-64M` and `minishlab/potion-code-16M-v2`.
+`minishlab/blink-multilingual-64M` and `minishlab/blink-code-16M`.
 
 Embeddings from each model (a request without a `model` field hits the default
 multilingual model; the code model is selected explicitly):
@@ -59,7 +59,7 @@ curl -s http://localhost:8080/v1/embeddings \
 
 curl -s http://localhost:8080/v1/embeddings \
   -H "Content-Type: application/json" \
-  -d '{"input":"def hello(): pass","model":"minishlab/potion-code-16M-v2"}' \
+  -d '{"input":"def hello(): pass","model":"minishlab/blink-code-16M"}' \
   | jq '.data[0].embedding | length'
 ```
 
@@ -69,7 +69,7 @@ The TEI-compatible endpoints behave identically:
 
 ```bash
 curl -s http://localhost:8080/info | jq .
-curl -s -X POST http://localhost:8080/tei/potion-code-16M-v2/embed \
+curl -s -X POST http://localhost:8080/tei/blink-code-16M/embed \
   -H "Content-Type: application/json" -d '{"inputs":["fn main() {}"]}' | jq '.[0] | length'
 ```
 
@@ -88,7 +88,7 @@ By default the stack serves exactly two models in one process:
 | Model | Role |
 |-------|------|
 | `minishlab/blink-multilingual-64M` | Serves requests that do not name a model (`DEFAULT_MODEL`) |
-| `minishlab/potion-code-16M-v2` | Selected explicitly via the request's `model` field or a `/tei/{model_id}/...` path |
+| `minishlab/blink-code-16M` | Selected explicitly via the request's `model` field or a `/tei/{model_id}/...` path |
 
 Both the model set and the default are overridable without touching
 `docker-compose.yml`:
@@ -104,7 +104,7 @@ For example, serving a single smaller model:
 
 ```bash
 cp .env.example .env
-# in .env: MODEL=minishlab/potion-base-2M and DEFAULT_MODEL=minishlab/potion-base-2M
+# in .env: MODEL=minishlab/blink-8M and DEFAULT_MODEL=minishlab/blink-8M
 docker compose up -d
 ```
 

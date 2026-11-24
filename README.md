@@ -38,7 +38,7 @@ Serve multiple models in one process:
 ```bash
 cargo run --release -- \
   --model minishlab/blink-multilingual-64M \
-  --model minishlab/potion-code-16M-v2 \
+  --model minishlab/blink-code-16M \
   --default-model minishlab/blink-multilingual-64M \
   --port 8080
 ```
@@ -48,7 +48,7 @@ Select a model in the request:
 ```bash
 curl -X POST http://localhost:8080/v1/embeddings \
   -H "Content-Type: application/json" \
-  -d '{"input":"def hello(): pass","model":"minishlab/potion-code-16M-v2"}'
+  -d '{"input":"def hello(): pass","model":"minishlab/blink-code-16M"}'
 ```
 
 ## TEI per-model endpoints
@@ -56,7 +56,7 @@ curl -X POST http://localhost:8080/v1/embeddings \
 TEI clients serving multiple models address a model explicitly through
 `POST /tei/{model_id}/embed` and `GET /tei/{model_id}/info`. The `{model_id}`
 path segment is the model's `--model-alias` or, by default, the last segment of
-its identifier (e.g. `minishlab/potion-code-16M-v2` → `potion-code-16M-v2`).
+its identifier (e.g. `minishlab/blink-code-16M` → `blink-code-16M`).
 Root `/embed` and `/info` continue to serve the default model.
 
 **Breaking change in 0.5.0**: the `?model=` query parameter on `/embed` and
@@ -109,7 +109,10 @@ starting points:
 |-------|-----------|----------|
 | `minishlab/blink-multilingual-64M` | ~256 MB | Default — 100+ languages, strongest multilingual quality |
 | `minishlab/blink-8M` | ~31 MB | English-only deployments at minimal footprint |
-| `minishlab/potion-code-16M-v2` | ~33 MB | Source code (Python, Java, JavaScript, Go, PHP, Ruby) |
+| `minishlab/blink-code-16M` | ~64 MB | Source code (Go, Java, JavaScript, PHP, Python, Ruby) |
+| `minishlab/potion-code-16M-v2` | ~33 MB | Superseded by `blink-code-16M` — kept for existing setups |
+| `minishlab/potion-base-8M` | ~31 MB | Superseded by `blink-8M` — kept for existing setups |
+| `minishlab/potion-multilingual-128M` | ~512 MB | Superseded by `blink-multilingual-64M` — kept for existing setups |
 
 Models load from the Hugging Face Hub at startup, or from a local path for
 air-gapped setups.
@@ -127,7 +130,7 @@ Serve multiple models via comma-separated `MODEL`:
 
 ```bash
 docker run -p 8080:8080 \
-  -e MODEL=minishlab/blink-multilingual-64M,minishlab/potion-code-16M-v2 \
+  -e MODEL=minishlab/blink-multilingual-64M,minishlab/blink-code-16M \
   -e DEFAULT_MODEL=minishlab/blink-multilingual-64M \
   model2vec-serve:latest
 ```
@@ -154,7 +157,7 @@ docker compose up -d
 ```
 
 The stack serves `minishlab/blink-multilingual-64M` (default) and
-`minishlab/potion-code-16M-v2`. Models download once into `./models` and
+`minishlab/blink-code-16M`. Models download once into `./models` and
 survive restarts. Customize via `.env` (see `.env.example`).
 
 See [docs/deployment/compose.md](docs/deployment/compose.md) for the full
@@ -182,7 +185,7 @@ helm repo add it-at-m https://it-at-m.github.io/helm-charts
 helm repo update
 helm install model2vec-serve it-at-m/model2vec-serve \
   --version 0.6.0 \
-  --set models={minishlab/blink-multilingual-64M,minishlab/potion-code-16M-v2} \
+  --set models={minishlab/blink-multilingual-64M,minishlab/blink-code-16M} \
   --set defaultModel=minishlab/blink-multilingual-64M \
   --set apiKey=your-secret-key
 ```
