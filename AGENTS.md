@@ -94,7 +94,7 @@ cargo run --release -- --model minishlab/blink-multilingual-64M --port 8080
 # Run the service locally with multiple models
 cargo run --release -- \
   --model minishlab/blink-multilingual-64M \
-  --model minishlab/potion-code-16M-v2 \
+  --model minishlab/blink-code-16M \
   --default-model minishlab/blink-multilingual-64M \
   --port 8080
 ```

@@ -150,10 +150,10 @@ curl -X POST http://localhost:8080/embed \
   -H "Content-Type: application/json" \
   -d '{"inputs":["Hello","World"]}'
 
-curl -X POST http://localhost:8080/tei/potion-code-16M-v2/embed \
+curl -X POST http://localhost:8080/tei/blink-code-16M/embed \
   -H "Content-Type: application/json" \
   -d '{"inputs":"def hello(): pass"}'
 
 curl http://localhost:8080/info
-curl http://localhost:8080/tei/potion-code-16M-v2/info
+curl http://localhost:8080/tei/blink-code-16M/info
 ```

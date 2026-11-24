@@ -32,7 +32,7 @@ Serve multiple models in one process:
 ```bash
 cargo run --release -- \
   --model minishlab/blink-multilingual-64M \
-  --model minishlab/potion-code-16M-v2 \
+  --model minishlab/blink-code-16M \
   --default-model minishlab/blink-multilingual-64M \
   --port 8080
 ```
@@ -75,7 +75,7 @@ With multiple models loaded, select a model explicitly:
 ```bash
 curl -X POST http://localhost:8080/v1/embeddings \
   -H "Content-Type: application/json" \
-  -d '{"input":"def hello(): pass","model":"minishlab/potion-code-16M-v2"}'
+  -d '{"input":"def hello(): pass","model":"minishlab/blink-code-16M"}'
 ```
 
 Expected response shape:
@@ -168,7 +168,7 @@ Serve multiple models:
 
 ```bash
 docker run -p 8080:8080 \
-  -e MODEL=minishlab/blink-multilingual-64M,minishlab/potion-code-16M-v2 \
+  -e MODEL=minishlab/blink-multilingual-64M,minishlab/blink-code-16M \
   -e DEFAULT_MODEL=minishlab/blink-multilingual-64M \
   model2vec-serve:latest
 ```
@@ -194,7 +194,7 @@ Install with multiple models:
 ```bash
 helm install model2vec-serve \
   oci://ghcr.io/it-at-m/helm-charts/model2vec-serve \
-  --set models={minishlab/blink-multilingual-64M,minishlab/potion-code-16M-v2} \
+  --set models={minishlab/blink-multilingual-64M,minishlab/blink-code-16M} \
   --set defaultModel=minishlab/blink-multilingual-64M \
   --set apiKey=secret-key \
   --set replicaCount=2
